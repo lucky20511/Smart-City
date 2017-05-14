@@ -28,9 +28,9 @@ def login(username, password) :
     result = db.Users.find_one({"username" : username, "password":password})
     print(result)
     if result is None:
-        msg = {"msg", "fail"}
+        msg = {"msg":"fail"}
     else:
-        msg = {"msg", "succeed"}
+        msg = {"msg":"succeed"}
     
     return msg
 
@@ -46,9 +46,9 @@ def signUp(username, password, clustername) :
                 "cluster":clustername
             }  
         db.Users.insert_one(query)
-        msg = {"msg", "succeed"}
+        msg = {"msg": "succeed"}
     else:
-        msg = {"msg", "failed"}
+        msg = {"msg":"fail"}
     
     return msg
 
@@ -57,19 +57,29 @@ def getClusterAllUser(clustername) :
     if result.count() > 0
         for c in result:
             print(c)
-        msg = {"msg", "succeed"} #TODO return JSON
+        msg = {"msg": "succeed"} #TODO return JSON
     else:
-        msg = {"msg", "failed"}
+        msg = {"msg": "fail"}
      
     return msg
 
 def getAllClusterAllUser() : 
+    result = db.Users.find()
+    for c in result:
+        print(c)
+        msg = {} #TODO return JSON
 
 
     return msg
 
 def deleteUser(username) : 
+    result = db.Users.delete_one({"username":username})
+    if result.delete_count() > 0
+        msg = {"msg": "succeed"}
+    else: 
+        msg = {"msg":"fail"}
 
+    
     return msg
 
 # Status
@@ -78,7 +88,7 @@ def getAllClusterStatus(clustername) :
     print(result)
     if result is None: 
         print("DHSDHFHDHDHHDHD")
-    msg = {"msg", "succeed"}
+    msg = {"msg":"succeed"}
     return msg
 
 def createStatus(username, time, body, image) :
@@ -90,12 +100,12 @@ def createStatus(username, time, body, image) :
         }  
     db.Status.insert_one(query)
 
-    msg = {"msg", "succeed"}
+    msg = {"msg":"succeed"}
     return msg
 
 def deleteStatus(time) : 
     result = db.Status.delete_one({"time": time})
-    msg = {"msg", "succeed"}
+    msg = {"msg":"succeed"}
     return msg
 
 # Cluster
@@ -108,16 +118,16 @@ def createCluster(clustername) :
         }
         db.Clusters.insert_one(query)
 
-        msg = {"msg", "succeed"}
+        msg = {"msg":"succeed"}
         return msg
     else:
-        msg = {"msg", "Duplicate Name"}
+        msg = {"msg":"fail"}
         return msg
 
 #TODO Cascading delete
 def deleteCluster(clustername) :    
     db.Clusters.delete_one({"clustername": clustername})
-    msg = {"msg", "succeed"}
+    msg = {"msg":"succeed"}
     return msg
 
 def getAllCluster() : 
