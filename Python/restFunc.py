@@ -24,7 +24,6 @@ Clusters = db['clusters']
 
 # User
 def login(username, password) : 
-
     result = db.Users.find_one({"username" : username, "password":password})
     print(result)
     if result is None:
@@ -34,8 +33,7 @@ def login(username, password) :
     
     return msg
 
-def signUp(username, password, clustername) : 
-    
+def signUp(username, password, clustername) :     
     check = db.Users.find_one({"username":username})
     if check is None:
         query = {
@@ -43,7 +41,9 @@ def signUp(username, password, clustername) :
                 "password": password,
                 "image": "",
                 "bio": "",
-                "cluster":clustername
+                "cluster":clustername,
+                "comments":[],
+                "likes":[]
             }  
         db.Users.insert_one(query)
         msg = {"msg": "succeed"}
@@ -68,8 +68,6 @@ def getAllClusterAllUser() :
     for c in result:
         print(c)
         msg = {} #TODO return JSON
-
-
     return msg
 
 def deleteUser(username) : 
@@ -77,18 +75,16 @@ def deleteUser(username) :
     if result.delete_count() > 0
         msg = {"msg": "succeed"}
     else: 
-        msg = {"msg":"fail"}
-
-    
+        msg = {"msg":"fail"}    
     return msg
 
 # Status
 def getAllClusterStatus(clustername) : 
-    result = db.Clusters.find_one({"clustername":clustername})
-    print(result)
+    result = db.Status.find({"clustername":clustername})
     if result is None: 
-        print("DHSDHFHDHDHHDHD")
-    msg = {"msg":"succeed"}
+        msg = {"msg":"fail"}
+    else:
+        msg = {"msg":"succeed"}
     return msg
 
 def createStatus(username, time, body, image) :
@@ -105,7 +101,10 @@ def createStatus(username, time, body, image) :
 
 def deleteStatus(time) : 
     result = db.Status.delete_one({"time": time})
-    msg = {"msg":"succeed"}
+    if result.delete_count() > 0
+        msg = {"msg": "succeed"}
+    else: 
+        msg = {"msg":"fail"}
     return msg
 
 # Cluster
@@ -132,9 +131,14 @@ def deleteCluster(clustername) :
 
 def getAllCluster() : 
     result = db.Clusters.find() 
-    for c in result:
-        print(c)
-    return ""
+    if result.count() > 0:    
+        for c in result:
+            print(c)
+        msg = {"msg":"succeed"}
+    else:
+        msg = {"msg":"fail"}
+
+    return msg
 
 
 
