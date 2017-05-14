@@ -8,8 +8,13 @@ from restFunc import *
 # createCluster("Cluster A")
 # createCluster("Cluster B")
 
-createPost("Jeremy", 1, "FFFFFFFF", "")
-createPost("Jeremy", 2, "DDDDDDDD", "")
-createPost("Jeremy", 3, "AAAAAAAA", "")
+# createPost("Jeremy", 1, "FFFFFFFF", "")
+# createPost("Jeremy", 2, "DDDDDDDD", "")
+# createPost("Jeremy", 3, "AAAAAAAA", "")
 
-getAllCluster()
+# getAllCluster()
+# getAllClusterPost("DDDDDDDD")
+# signUp("Dylan", "1234", "Cluster A")
+# login("George", "")
+# login("Dylan", "1234")
+getClusterAllUser("Cluster A")
