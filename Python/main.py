@@ -1,6 +1,7 @@
 from restFunc import *
 
-
+############   TEST CASE  #########################
+test()
 # createPost("Jeremy", 222222, "GLBHDHFDFSD", "")
 # deletePost(222222)
 
@@ -17,4 +18,31 @@ from restFunc import *
 # signUp("Dylan", "1234", "Cluster A")
 # login("George", "")
 # login("Dylan", "1234")
-getClusterAllUser("Cluster A")
+# getClusterAllUser("Cluster A")
+
+############   SCHEMA   #########################
+# User
+# {
+# 	"username" : "....",
+# 	"password": "....",
+# 	"image": "....",
+# 	"bio": "....",
+# 	"cluster":"....",
+# }
+
+# Cluster
+# {
+# 	"clustername":"....",
+# 	"users":["alice", "george"]
+# }
+
+
+# Status
+# {
+# 	body: "....",
+# 	time: "....",
+# 	username: "....",
+# 	image: "....",
+# 	comments: [],
+# 	likes: []
+# }

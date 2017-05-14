@@ -1,8 +1,10 @@
 
 from flask import Flask, request, Response, json, abort
-import requests 
+# import requests 
 from pymongo import MongoClient
 import pprint
+import bson
+from bson.json_util import dumps
 
 app = Flask(__name__)
 
@@ -23,7 +25,8 @@ Clusters = db['clusters']
 # @app.route('/locations/<int:postID>', methods = ['GET', 'PUT', 'DELETE'])
 
 # User
-def login(username, password) : 
+def login(username, password):
+
     result = db.Users.find_one({"username" : username, "password":password})
     print(result)
     if result is None:
@@ -33,7 +36,7 @@ def login(username, password) :
     
     return msg
 
-def signUp(username, password, clustername) :     
+def signUp(username, password, cluster) :     
     check = db.Users.find_one({"username":username})
     if check is None:
         query = {
@@ -41,9 +44,7 @@ def signUp(username, password, clustername) :
                 "password": password,
                 "image": "",
                 "bio": "",
-                "cluster":clustername,
-                "comments":[],
-                "likes":[]
+                "cluster":cluster
             }  
         db.Users.insert_one(query)
         msg = {"msg": "succeed"}
@@ -52,9 +53,9 @@ def signUp(username, password, clustername) :
     
     return msg
 
-def getClusterAllUser(clustername) : 
-    result = db.Users.find({"clustername":clustername}) 
-    if result.count() > 0
+def getClusterAllUser(cluster) : 
+    result = db.Users.find({"cluster":cluster}) 
+    if result.count() > 0:
         for c in result:
             print(c)
         msg = {"msg": "succeed"} #TODO return JSON
@@ -72,15 +73,16 @@ def getAllClusterAllUser() :
 
 def deleteUser(username) : 
     result = db.Users.delete_one({"username":username})
-    if result.delete_count() > 0
+    if result.delete_count() > 0:
         msg = {"msg": "succeed"}
     else: 
         msg = {"msg":"fail"}    
     return msg
 
 # Status
+
 def getAllClusterStatus(clustername) : 
-    result = db.Status.find({"clustername":clustername})
+    result = db.Status.find({"clustername":clustername}) #TODO WRONG query
     if result is None: 
         msg = {"msg":"fail"}
     else:
@@ -93,6 +95,8 @@ def createStatus(username, time, body, image) :
             "time": time,
             "image": image,
             "body": body,
+            "comments":[],
+            "likes":[]
         }  
     db.Status.insert_one(query)
 
@@ -101,7 +105,7 @@ def createStatus(username, time, body, image) :
 
 def deleteStatus(time) : 
     result = db.Status.delete_one({"time": time})
-    if result.delete_count() > 0
+    if result.delete_count() > 0:
         msg = {"msg": "succeed"}
     else: 
         msg = {"msg":"fail"}
@@ -125,7 +129,10 @@ def createCluster(clustername) :
 
 #TODO Cascading delete
 def deleteCluster(clustername) :    
+    # Need to get users array from Cluster
     db.Clusters.delete_one({"clustername": clustername})
+    db.Users.delete_many({"cluster": clustername})
+    
     msg = {"msg":"succeed"}
     return msg
 
@@ -140,6 +147,25 @@ def getAllCluster() :
 
     return msg
 
+def getACluster(clustername):
+    result = db.Clusters.find_one({"clustername": clustername})
+    print(dumps(result))    ################################################## JSON FORMAT <------------------
+
+def test():
+    getACluster("Cluster A")
+    # createCluster("Cluster A")
+    # createCluster("Cluster B")
+    # signUp("Jeremy", 1234, "Cluster A")
+    # signUp("George", 1234, "Cluster A")
+    # signUp("Bob", 1234, "Cluster A")
+    # signUp("Mary", 1234, "Cluster B")
+    # signUp("Lisa", 1234, "Cluster B")
+
+    # createStatus("Jeremy", 1, "AAAAAAAAA", "")
+    # createStatus("George", 2, "BBBBBBBBB", "")
+    # createStatus("Bob", 3, "CCCCCCCCC", "")
+    # createStatus("Lisa", 4, "FFFFFFFF", "")
+    # createStatus("Lisa", 5, "DDDDDDDD", "")
 
 
 
