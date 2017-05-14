@@ -1,0 +1,22 @@
+{
+  "name": "SmartCity",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app" 
+  },
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^1.0.0",
+    "ejs-locals": "^1.0.2",
+    "express": "^4.15.2",
+    "express-session": "^1.15.2",
+    "logger": "0.0.1",
+    "mongoose": "^4.9.8",
+    "morgan": "^1.8.1",
+    "path": "^0.12.7",
+    "socket.io": "~0.9.16"
+  }
+}
+

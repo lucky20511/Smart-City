@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<script>
+	var myname = "<%= currentUser.username %>";
+</script>
+<%
+if (user.username == currentUser.username) { 
+	var isMe = true;
+} else {
+	var isMe = false;
+}
+%>
+<html class="no-js"> 
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>nodebook</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/css/normalize.min.css">
+        <link rel="stylesheet" href="/css/main.css">
+        <script src="/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <div class="header-container">
+            <header class="wrapper clearfix">
+                <a href="/"><img src="/img/nodebook.png" id="logo"/></a>
+                <div id="rightside">
+					<a id="user" href="/users/<%= currentUser.username %>">
+						<img id="userpic" src="<%= currentUser.image %>"/>
+						<span id="username"><%= currentUser.username %></span>
+					</a>
+					<a href="/logout" id="logout">Logout</a>
+				</div>
+            </header>
+        </div>
+        <div class="main-container">
+            <div class="main wrapper clearfix">
+                <!-- body -->
+                <aside class="centerme">
+					<h1 id="theusername"><%= user.username %></h1>
+					<img id="profPic" src="<%= user.image %>"><br>
+					<% if (isMe) { %> 
+				    <form method="POST" action="/profile">
+				    	Image<br>
+						<input name="image" type="text" id="image" value="<%= user.image %>"/><br>
+						Bio<br>
+						<textarea id="bio" name="bio"><%= user.bio %></textarea><br><br>
+						<input class="sub" type="submit" value="Update">
+					</form>
+					<% } else { %>
+						<%= user.bio %>
+					<% } %>
+				</aside>
+
+				<article class="centerme">
+					<div id="postsOuter">
+					<% 
+					if (isMe) { %>
+						<form action="/statuses"  id="postNewStatus" method="POST">
+							<textarea id="newstatus" name="status" placeholder="What's your status?"></textarea>
+							<input class="sub" type="submit" value="Post"/>
+						</form>
+					<% 
+					}
+
+					for (var i=0;i<statuses.length;i++) { %>
+						<div class="post">
+							<div class="timestamp"><abbr class="timeago" title="<%= new Date(statuses[i].time).toISOString() %>"></abbr></div>
+							<a class="colorize" href="/users/<%= user.username %>">
+								<div class="smallpic">
+									<img class="smallpic_img" src="<%= user.image %>">
+								</div>	
+								<div class="smallname"><%= user.username %></div>
+							</a>
+							<br>
+							<div class="statusbody"><%= statuses[i].body %></div>
+						</div>
+					<% } %>
+
+					</div>
+
+				</article>
+
+                <!-- body -->
+            </div>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="/js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+        <script src="/js/vendor/jquery.timeago.js"></script>
+        <script src="/js/main.js"></script>
+    </body>
+</html>
+
+
+
+
+
+
+

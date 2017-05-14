@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>nodebook</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/css/normalize.min.css">
+        <link rel="stylesheet" href="/css/main.css">
+        <script src="/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <div class="header-container">
+            <header class="wrapper clearfix">
+                <a href="/"><img src="/img/nodebook.png" id="logo"/></a>
+                <div id="rightside">
+					<a id="user" href="/users/<%= user.username %>">
+						<img id="userpic" src="<%= user.image %>"/>
+						<span id="username"><%= user.username %></span>
+					</a>
+					<a href="/logout" id="logout">Logout</a>
+				</div>
+            </header>
+        </div>
+        <div class="main-container">
+            <div class="main wrapper clearfix">
+                <!-- body -->
+                <h3 class="centerme" id="gf">Global Feed</h3>
+				<div id="feed">
+					<% if (statuses[0]) { %>
+					<div id="postsOuter">
+						<div id="socket"></div>
+						<% for(var i=0; i<statuses.length; i++) { %>
+							<div class="post">
+								<div class="timestamp"><abbr class="timeago" title="<%= new Date(statuses[i].time).toISOString() %>"></abbr></div>
+								<a class="colorize" href="/users/<%= statuses[i].username %>">
+									<div class="smallpic">
+										<img class="smallpic_img" src="<%= statuses[i].image %>"/>
+									</div>	
+									<div class="smallname"><%= statuses[i].username %></div>
+								</a>
+								<br>
+								<div class="statusbody"><%= statuses[i].body%></div>
+							</div>
+						<% } %>
+					<% } else { %>
+						<div id="noposts"> No posts at this time</div>
+					<% } %>
+					</div>
+				</div>
+                <!-- body -->
+            </div>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="/js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+        <script src="/js/vendor/jquery.timeago.js"></script>
+        <script src="/js/main.js"></script>
+    </body>
+</html>
+
