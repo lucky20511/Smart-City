@@ -2,7 +2,7 @@
 from flask import Flask, request, Response, json, abort
 # import requests 
 from pymongo import MongoClient
-import pprint
+
 import bson
 from bson.json_util import dumps
 
@@ -16,27 +16,34 @@ Status = db['status']
 Clusters = db['clusters']
 
 # TODO 
-# Cascading Delete
 # Return msg format
 # Error Handling
-# Unicode String 
-
-# @app.route("/v1/expenses/<expense_id>", methods = ["GET", "PUT", "DELETE"])
-# @app.route('/locations/<int:postID>', methods = ['GET', 'PUT', 'DELETE'])
 
 # User
-def login(username, password):
+@app.route("/login", methods = ["POST"])
+def login():
+
+    p_body = json.loads(request.data)
+    username = p_body["username"]
+    password = p_body["password"]
 
     result = db.Users.find_one({"username" : username, "password":password})
-    print(result)
+    print(dumps(result))
     if result is None:
         msg = {"msg":"fail"}
     else:
         msg = {"msg":"succeed"}
     
-    return msg
+    return dumps(msg)
 
-def signUp(username, password, cluster) :     
+@app.route("/signup", methods = ["POST"])
+def signUp() :     
+    
+    p_body = json.loads(request.data)
+    username = p_body["username"]
+    password = p_body["password"]
+    cluster = p_body["cluster"]
+
     check = db.Users.find_one({"username":username})
     if check is None:
         query = {
@@ -44,52 +51,110 @@ def signUp(username, password, cluster) :
                 "password": password,
                 "image": "",
                 "bio": "",
-                "cluster":cluster
+                "cluster":cluster, 
+                "type": "User"
             }  
         db.Users.insert_one(query)
+        db.Clusters.update_one({"clustername":cluster},{"$addToSet":{"users":username}},upsert=False)
+      
         msg = {"msg": "succeed"}
     else:
         msg = {"msg":"fail"}
     
-    return msg
+    return dumps(msg)
 
-def getClusterAllUser(cluster) : 
+@app.route("/users", methods = ["GET"])
+def getClusterAllUser() : 
+    cluster = request.args['cluster']
     result = db.Users.find({"cluster":cluster}) 
+    msg = []
     if result.count() > 0:
         for c in result:
-            print(c)
-        msg = {"msg": "succeed"} #TODO return JSON
+            msg.append(c)
     else:
         msg = {"msg": "fail"}
      
-    return msg
+    return dumps(msg)
 
+@app.route("/allclusters", methods = ["GET"])
 def getAllClusterAllUser() : 
     result = db.Users.find()
+    msg = []
     for c in result:
         print(c)
-        msg = {} #TODO return JSON
-    return msg
+        msg.append(c)
+    return dumps(msg)
 
-def deleteUser(username) : 
+@app.route("/users", methods = ["DELETE"])
+def deleteUser() : 
+    username = request.args['username']
+    
+    user = db.Users.find_one({'username':username})
+    cluster = user['cluster']
     result = db.Users.delete_one({"username":username})
-    if result.delete_count() > 0:
+    db.Clusters.update_one({"clustername":cluster},{"$pull":{"users":username}},upsert=False)
+    if result is not None:
         msg = {"msg": "succeed"}
     else: 
         msg = {"msg":"fail"}    
-    return msg
 
-# Status
+    return dumps(msg)
 
-def getAllClusterStatus(clustername) : 
-    result = db.Status.find({"clustername":clustername}) #TODO WRONG query
-    if result is None: 
-        msg = {"msg":"fail"}
+@app.route("/createsysadmin", methods = ["POST"])
+def createAdmin() :
+    query = {
+        "username" : "sysadmin",
+        "password": "admin",
+        "type": "Sysadmin"
+    }  
+
+    result = db.Users.insert_one(query)
+    if result is None:
+        msg = {"msg": "fail"}
     else:
         msg = {"msg":"succeed"}
-    return msg
 
-def createStatus(username, time, body, image) :
+    return dumps(msg)
+
+# Status
+@app.route('/posts', methods = ['GET'])
+def getAllClusterStatus() : 
+    clustername = request.args['cluster']
+    check = db.Clusters.find({"clustername":clustername})
+
+    check = db.Clusters.find({"clustername":clustername})
+    db.temp.drop()
+    temp = db['temp']
+
+    if check is not None:
+        result = db.Users.find({"cluster":clustername})
+        if result.count() > 0:
+            for c in result:
+                username = c['username']
+                status_result = db.Status.find({"username":username})
+                if status_result.count() > 0:
+                    for c in status_result:
+                        db.temp.insert(c)
+                
+                    ans = db.temp.find().sort('time',-1)
+                    msg = ans   
+        
+        else:
+            msg = {"msg":"fail"}
+                
+    else:
+        msg = {"msg":"fail"}
+
+    return dumps(msg)
+
+@app.route('/posts', methods = ['POST'])
+def createStatus() :
+    p_body = json.loads(request.data)
+    username = p_body["username"]
+    time = p_body["time"]
+    body = p_body["body"]
+    image= p_body["image"]
+
     query = {
             "username" : username,
             "time": time,
@@ -98,22 +163,33 @@ def createStatus(username, time, body, image) :
             "comments":[],
             "likes":[]
         }  
-    db.Status.insert_one(query)
+    result = db.Status.insert_one(query)
+    if result is None:
+        msg = {"msg":"fail"}
+    else:    
+        msg = {"msg":"succeed"}
+    return dumps(msg)
 
-    msg = {"msg":"succeed"}
-    return msg
+@app.route('/posts', methods = ['DELETE'])
+def deleteStatus() : 
 
-def deleteStatus(time) : 
+    time = request.args['time']
+
     result = db.Status.delete_one({"time": time})
-    if result.delete_count() > 0:
+    if result is not None:
         msg = {"msg": "succeed"}
     else: 
         msg = {"msg":"fail"}
-    return msg
+    return dumps(msg)
 
 # Cluster
-def createCluster(clustername) : 
+@app.route('/clusters', methods = ['POST'])
+def createCluster() : 
+    
+    p_body = json.loads(request.data)
+    clustername = p_body["clustername"]
     check = db.Clusters.find_one({"clustername": clustername})
+
     if check is None:
         query = {
             "clustername" : clustername,
@@ -121,52 +197,80 @@ def createCluster(clustername) :
         }
         db.Clusters.insert_one(query)
 
+        query = {
+                "username" : clustername,
+                "password": "admin",
+                "image": "",
+                "bio": "",
+                "cluster":clustername, 
+                "type": "Moderator"
+            }  
+        db.Users.insert_one(query)
+        db.Clusters.update_one({"clustername":clustername},{"$addToSet":{"users":clustername}},upsert=False)
+
         msg = {"msg":"succeed"}
-        return msg
     else:
         msg = {"msg":"fail"}
-        return msg
-
-#TODO Cascading delete
-def deleteCluster(clustername) :    
-    # Need to get users array from Cluster
-    db.Clusters.delete_one({"clustername": clustername})
-    db.Users.delete_many({"cluster": clustername})
     
-    msg = {"msg":"succeed"}
-    return msg
+    return dumps(msg)
 
+@app.route('/clusters', methods = ['DELETE'])
+def deleteCluster() :
+    clustername = request.args['clustername']
+
+    check = db.Clusters.find_one({"clustername":clustername})
+    if check is not None:
+        result = db.Users.find({"cluster":clustername})
+        if result is not None:
+            for c in result:
+                username = c['username']
+                print(username)
+                bulk = db.Status.initialize_unordered_bulk_op()
+                bulk.find({"username":username}).remove()
+                bulk_result = bulk.execute()
+                # print(dumps(bulk_result))
+
+        db.Clusters.delete_one({"clustername": clustername})
+        db.Users.delete_many({"cluster": clustername})
+        msg = {"msg":"succeed"}
+    
+    else:
+        msg = {"msg":"fail"}
+    return dumps(msg)
+
+@app.route('/clusters', methods = ['GET'])
 def getAllCluster() : 
     result = db.Clusters.find() 
+    msg = []
     if result.count() > 0:    
         for c in result:
-            print(c)
-        msg = {"msg":"succeed"}
+            msg.append(c)
     else:
         msg = {"msg":"fail"}
 
-    return msg
+    return dumps(msg) 
 
 def getACluster(clustername):
     result = db.Clusters.find_one({"clustername": clustername})
     print(dumps(result))    ################################################## JSON FORMAT <------------------
 
+@app.route('/test', methods = ['GET'])
 def test():
-    getACluster("Cluster A")
-    # createCluster("Cluster A")
-    # createCluster("Cluster B")
-    # signUp("Jeremy", 1234, "Cluster A")
+    # getACluster("ClusterA")
+    createCluster()
+    # createCluster("ClusterB")
+    signUp("Ass", 1234, "ClusterC")
+    signUp("Tiger", 1234, "ClusterC")
+    signUp("Mike", 1234, "ClusterC")
     # signUp("George", 1234, "Cluster A")
     # signUp("Bob", 1234, "Cluster A")
     # signUp("Mary", 1234, "Cluster B")
     # signUp("Lisa", 1234, "Cluster B")
 
-    # createStatus("Jeremy", 1, "AAAAAAAAA", "")
-    # createStatus("George", 2, "BBBBBBBBB", "")
+    createStatus("Ass", 10, "AAAAAAAAA", "")
+    createStatus("Tiger", 11, "BBBBBBBBB", "")
+    createStatus("Tiger", 12, "BBBBBBBBB", "")
     # createStatus("Bob", 3, "CCCCCCCCC", "")
-    # createStatus("Lisa", 4, "FFFFFFFF", "")
-    # createStatus("Lisa", 5, "DDDDDDDD", "")
-
 
 
 if __name__ ==  "__main__":
@@ -194,7 +298,7 @@ if __name__ ==  "__main__":
 #             "image": "....",
 #             "bio": "....",
 #             "cluster":"...."
-#            
+#             "type":"User/Moderator/SystemAdmin"
 #         }
 
 #         #Cluster
