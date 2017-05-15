@@ -19,7 +19,6 @@ Clusters = db['clusters']
 # Return msg format
 # Error Handling
 
-
 # User
 @app.route("/login", methods = ["POST"])
 def login():
@@ -29,7 +28,7 @@ def login():
     password = p_body["password"]
 
     result = db.Users.find_one({"username" : username, "password":password})
-    print(result)
+    print(dumps(result))
     if result is None:
         msg = {"msg":"fail"}
     else:
@@ -66,14 +65,12 @@ def signUp() :
 
 @app.route("/users", methods = ["GET"])
 def getClusterAllUser() : 
-
     cluster = request.args['cluster']
-
-    result = db.Users.find({"clustername":cluster}) 
+    result = db.Users.find({"cluster":cluster}) 
+    msg = []
     if result.count() > 0:
         for c in result:
-            print(c)
-        msg = {"msg": "succeed"} #TODO return JSON<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            msg.append(c)
     else:
         msg = {"msg": "fail"}
      
@@ -81,11 +78,11 @@ def getClusterAllUser() :
 
 @app.route("/allclusters", methods = ["GET"])
 def getAllClusterAllUser() : 
-
     result = db.Users.find()
+    msg = []
     for c in result:
         print(c)
-        msg = {} #TODO return JSON<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        msg.append(c)
     return dumps(msg)
 
 @app.route("/users", methods = ["DELETE"])
@@ -96,7 +93,7 @@ def deleteUser() :
     cluster = user['cluster']
     result = db.Users.delete_one({"username":username})
     db.Clusters.update_one({"clustername":cluster},{"$pull":{"users":username}},upsert=False)
-    if result.delete_count() > 0:
+    if result is not None:
         msg = {"msg": "succeed"}
     else: 
         msg = {"msg":"fail"}    
@@ -123,9 +120,8 @@ def createAdmin() :
 @app.route('/posts', methods = ['GET'])
 def getAllClusterStatus() : 
     clustername = request.args['cluster']
-    check = db.Clusters.find({"clustername":clustername}) #TODO Sort Status by Time<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    check = db.Clusters.find({"clustername":clustername})
 
-    # for doc in collection.find().sort('field', 1):
     check = db.Clusters.find({"clustername":clustername})
     db.temp.drop()
     temp = db['temp']
@@ -149,8 +145,6 @@ def getAllClusterStatus() :
     else:
         msg = {"msg":"fail"}
 
-    # db.temp.drop()
-    # print(msg)
     return dumps(msg)
 
 @app.route('/posts', methods = ['POST'])
@@ -182,7 +176,7 @@ def deleteStatus() :
     time = request.args['time']
 
     result = db.Status.delete_one({"time": time})
-    if result.delete_count() > 0:
+    if result is not None:
         msg = {"msg": "succeed"}
     else: 
         msg = {"msg":"fail"}
@@ -224,7 +218,7 @@ def createCluster() :
 def deleteCluster() :
     clustername = request.args['clustername']
 
-    check = db.Clusters.find({"clustername":clustername})
+    check = db.Clusters.find_one({"clustername":clustername})
     if check is not None:
         result = db.Users.find({"cluster":clustername})
         if result is not None:
@@ -235,8 +229,6 @@ def deleteCluster() :
                 bulk.find({"username":username}).remove()
                 bulk_result = bulk.execute()
                 # print(dumps(bulk_result))
-                
-        else: print('NONE--------------------------------------------------------')
 
         db.Clusters.delete_one({"clustername": clustername})
         db.Users.delete_many({"cluster": clustername})
@@ -249,14 +241,14 @@ def deleteCluster() :
 @app.route('/clusters', methods = ['GET'])
 def getAllCluster() : 
     result = db.Clusters.find() 
+    msg = []
     if result.count() > 0:    
         for c in result:
-            print(c)
-        msg = {"msg":"succeed"}
+            msg.append(c)
     else:
         msg = {"msg":"fail"}
 
-    return dumps(msg)   #TODO<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< RETURN JSON
+    return dumps(msg) 
 
 def getACluster(clustername):
     result = db.Clusters.find_one({"clustername": clustername})
