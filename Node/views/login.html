@@ -5,50 +5,88 @@
         <title>nodebook</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
-        <link rel="stylesheet" href="/css/normalize.min.css">
-        <link rel="stylesheet" href="/css/main.css">
+        <!-- <link rel="stylesheet" href="/css/new.css"> -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <!-- <link rel="stylesheet" href="/css/normalize.min.css">
+        <link rel="stylesheet" href="/css/main.css"> -->
         <script src="/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
-        <div class="header-container">
-            <header class="wrapper clearfix">
-                <a href="/"><img src="/img/nodebook.png" id="logo"/></a>
-                <a href="/login" id="login">Login</a>
-            </header>
-        </div>
-        <div class="main-container">
-            <div class="main wrapper clearfix">
-            	 <!-- body -->
-            	 <article class="centerme">
-					<h1 class="no-margin-top">Login</h1>
-					<% if (error2) { %> <div class="error"><%= error2 %></div><% } %>
-					
-					<% for (var i=0;i<cluster.length;i++) { %>
-						<%= cluster %>
 
-					<% } %>
-					<form action="/login" method="POST">
-						<input type="text" name="username" placeholder="username"/><br>
-					    <input type="password" name="password" placeholder="password"/><br>
-					    <input type="submit" value="Login"/>
-				    </form>
-				</article>
+            <!-- <div class="container">
 
-				<aside class="centerme">
-				    <h3>Not a member? Sign up!</h3>
-				     <% if (error1) { %> <div class="error"><%= error1 %></div><% } %>
-				    <form method="post" action="/signup">
-					    <input type="text" name="username" placeholder="username"/><br>
-					    <input type="password" name="password" placeholder="password"/><br>
-					    <input type="password" name="confirm" placeholder="confirm"/><br>
-				    	<button type="sumbit"> Sign Up! </button>
-				    </form>
-				</aside>
+              <form class="form-signin">
+                    <h2 class="form-signin-heading">Please sign in</h2>
+                    <label for="inputEmail" class="sr-only">Email address</label>
+                    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                    <div class="checkbox">
+                      <label>
+                        <input type="radio" value="remember-me"> Remember me
+                        <input type="radio" value="remember-me"> Remember me
+                      </label>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+              </form>
 
-            	<!-- body -->
+            </div> -->
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-3" >
+                        <br><br><br><br><br><br><br>
+                            <h1>Sign up!</h1>
+                             <% if (error1) { %> <div class="error"><%= error1 %></div><% } %>
+                            <form method="post" action="/signup">
+                                <% if(cluster.length > 0) { %>
+                                    <% for (var i=0;i<cluster.length;i++) { %>
+                                        <% if(i == 0) { %>
+                                            <input type="radio" name="clustername" value="<%=cluster[i].clustername%>" checked> <%=cluster[i].clustername%><br>
+                                        <% } else { %>
+                                            <input type="radio" name="clustername" value="<%=cluster[i].clustername%>"> <%=cluster[i].clustername%><br>
+                                        <% } %>
+                                    <% } %>
+                                <% } %>
+                                <input type="text" class="form-control" name="username" placeholder="username"/><br>
+                                <input type="password" class="form-control" name="password" placeholder="password"/><br>
+                                <input type="password" class="form-control" name="confirm" placeholder="confirm"/><br>
+                                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up!</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                     <div class="row">
+                        <div class="col-md-8 col-md-offset-1">
+                            <br><br><br><br><br><br><br><br><br>
+        					<h1 class="no-margin-top">Login</h1>
+        					<% if (error2) { %> <div class="error"><%= error2 %></div><% } %>
+        					<form action="/login" method="POST" class="form-signin">
+        						<input type="text" class="form-control" name="username" placeholder="username"/><br>
+        					    <input type="password" class="form-control" name="password" placeholder="password"/><br>
+        					    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+        				    </form>
+                        </div>
+                    </div>
+                </div>
+
+
+
             </div>
-        </div>
+            <!-- body -->
+            
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="/js/vendor/jquery-1.10.1.min.js"><\/script>')</script>

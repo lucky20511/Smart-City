@@ -40,7 +40,8 @@ var User = mongoose.model('User', {
 	password: String,
 	image: String,
 	bio: String,
-	cluster:String
+	cluster:String,
+	type:String
 });
 
 var Cluster = mongoose.model('Cluster', {
@@ -55,7 +56,8 @@ var Status = mongoose.model('Status', {
 	username: String,
 	image: String,
 	comments: Array,
-	likes: Array
+	likes: Array,
+	cluster:String
 });
 /************************/
 /*** RUN the Service  ***/
@@ -68,6 +70,10 @@ console.log('Express server listening on port %s', port);
 
 
 
+app.get('/test', function (req, res) {
+	res.render('profile');
+});
+
 /**************************/
 /***    Presentation    ***/
 /**************************/
@@ -76,11 +82,12 @@ app.get('/', function (req, res) {
 
 	// Already logged in
 	if (req.session.user){
-		Status.find({}).sort({time: -1}).exec(function (err, statuses){
-			//res.render('homepage', {user: req.session.user, statuses: statuses});
 
-			res.redirect(path.join('/users/'+req.session.user.username));
-		});
+
+		res.redirect(path.join('/users/'+req.session.user.username));
+		// Status.find({}).sort({time: -1}).exec(function (err, statuses){
+		// 	//res.render('homepage', {user: req.session.user, statuses: statuses});
+		// });
 	// Not logged in
 	} else {
 		res.redirect('login');
@@ -101,6 +108,22 @@ app.get('/logout', function (req, res) {
 
 app.get('/login', function (req, res) {
 
+	User.findOne({username:'sysadmin'}, function (err, user) {
+		if(err || !user){
+			var userData = { 
+					cluster: 'ALL',
+					username: 'sysadmin',
+					password: 'admin',
+					image: 'http://leadersinheels.com/wp-content/uploads/facebook-default.jpg', //default image
+					bio: 'Hello, this is my bio!',
+					hidden: false,
+					type: 'Sysadmin'
+			};
+			var newUser = new User(userData).save(function (err){});
+		}
+	});
+
+
 	var error1 = null;
 	var error2 = null;
 
@@ -112,14 +135,11 @@ app.get('/login', function (req, res) {
 	if (req.query.error2) {
 		error2 = "Sorry please try again";
 	}
-	var clusterData = { 
-		clustername: "fire",
-		users:[]
-	};
-	var newCluster = new Cluster(clusterData).save(function (err){
-
-
-	});
+	// var clusterData = { 
+	// 	clustername: "fire",
+	// 	users:[]
+	// };
+	// var newCluster = new Cluster(clusterData).save(function (err){});
 
 	Cluster.find({}).exec(function (err, clusters){
 		//res.render('homepage', {user: req.session.user, statuses: statuses});
@@ -141,72 +161,7 @@ app.get('/login', function (req, res) {
 });
 
 
-// update other user's profile
-app.get('/moderator', function (req, res) {
 
-	res.render('moderator');
-	// Already logged in
-	// if (req.session.user) {
-	
-	// 	var username = req.session.user.username;
-	// 	var query = {username: username};
-
-	// 	var newBio = req.body.bio;
-	// 	var newImage = req.body.image;
-
-	// 	var change = {bio: newBio, image: newImage};
-
-	// 	User.update(query, change, function (err, user) {
-
-	// 		Status.update(query, {image: newImage}, {multi: true}, function(err, statuses){
-				
-	// 			console.log('Username has updated their profile');
-	// 			req.session.user.bio = newBio;
-	// 			req.session.user.image = newImage;
-	// 		    res.redirect(path.join('/users/'+username));
-	// 		});
-
-	// 	});
-	// 	res.render('moderator');
-	// // Not logged in
-	// } else {
-	// 	res.redirect('/login');
-	// }
-});
-
-
-// update other user's profile
-app.get('/sysadmin', function (req, res) {
-
-	res.render('sysadmin');
-	// Already logged in
-	// if (req.session.user) {
-	
-	// 	var username = req.session.user.username;
-	// 	var query = {username: username};
-
-	// 	var newBio = req.body.bio;
-	// 	var newImage = req.body.image;
-
-	// 	var change = {bio: newBio, image: newImage};
-
-	// 	User.update(query, change, function (err, user) {
-
-	// 		Status.update(query, {image: newImage}, {multi: true}, function(err, statuses){
-				
-	// 			console.log('Username has updated their profile');
-	// 			req.session.user.bio = newBio;
-	// 			req.session.user.image = newImage;
-	// 		    res.redirect(path.join('/users/'+username));
-	// 		});
-
-	// 	});
-	// 	res.render('moderator');
-	// // Not logged in
-	// } else {
-	// 	res.redirect('/login');
-	// }
-});
 
 // view other user's profile
 app.get('/users/:username', function (req, res) {
@@ -230,14 +185,72 @@ app.get('/users/:username', function (req, res) {
 				//			moderator -> moderator
 				//			sysadmin --> admin
 
+				var clustername;
+				Cluster.find({}).exec(function (err, clusters){
+					//res.render('homepage', {user: req.session.user, statuses: statuses});
+					if(err){
+						console.log(err);
+					}
+					clustername = clusters;
+				
+					console.log("!!!!!");
+					console.log(req.session.user);
 
-				Status.find(query).sort({time: -1}).exec(function(err, statuses){
-					res.render('profile', {
-						user: user, 
-						statuses: statuses, 
-						currentUser: currentUser
-					});	
+					if(user.type === 'User'){
+						//current user only
+						//Status.find(query).sort({time: -1}).exec(function(err, statuses){
+						//all user
+						console.log("@@@@@");
+						console.log(clustername);
+						var query = { $or:[{cluster: user.cluster},{cluster: 'ALL'}]};
+						Status.find(query).sort({time: -1}).exec(function(err, statuses){
+							res.render('profile', {
+								user: user, 
+								statuses: statuses, 
+								currentUser: currentUser,
+								cluster: clustername
+							});	
+						});
+					}else if(user.type === 'Moderator'){
+						//get the list of user and the list of status
+
+						console.log("@@@@@");
+						console.log(clustername);
+						var query = { $or:[{cluster: user.username}]};
+						Status.find(query).sort({time: -1}).exec(function(err, statuses){
+							res.render('moderator',{
+								user: user, 
+								statuses: statuses, 
+								currentUser: currentUser,
+								cluster: clustername
+
+							});
+						});
+					}else if((req.session.user.type === 'Sysadmin') &&  user.type === 'Sysadmin'){
+						//get the list of all clusters
+						var query = {};
+						console.log("@@@@@");
+						console.log(clustername);
+						Status.find(query).sort({time: -1}).exec(function(err, statuses){
+							res.render('sysadmin',{
+								user: user, 
+								statuses: statuses, 
+								currentUser: currentUser,
+								cluster: clustername
+
+							});
+						});
+					}
+
+
+
+
+
 				});
+
+				
+
+				
 			}
 		});
 	// Not logged in
@@ -278,6 +291,7 @@ app.post('/signup', function (req, res){
 	var username = req.body.username.toLowerCase();
 	var password = req.body.password;
 	var confirm = req.body.confirm;
+	var clustername = req.body.clustername;
 	if(password != confirm) {
 		res.redirect('/login?error1=1');
 	}
@@ -293,18 +307,19 @@ app.post('/signup', function (req, res){
 				res.redirect('/login?error1=1');
 			} else {
 				var userData = { 
+					cluster: clustername,
 					username: username,
 					password: password,
 					image: 'http://leadersinheels.com/wp-content/uploads/facebook-default.jpg', //default image
-					bio: 'Im new to NodeBook!',
+					bio: 'Hello, this is my bio!',
 					hidden: false,
-					type: 'User',
-					wall: []
+					type: 'User'
 				};
+				console.log(userData);
 				var newUser = new User(userData).save(function (err){
 
 					req.session.user = userData;
-					console.log('New user has been created!');
+					console.log('New user has been created!  type:'+req.session.user.type+" cluster:"+req.session.user.cluster);
 					res.redirect(path.join('/users/'+username));
 
 				});
@@ -346,6 +361,45 @@ app.post('/profile', function (req, res) {
 	}
 });
 
+// update other user's profile
+app.post('/cluster', function (req, res) {
+
+	// Already logged in
+	if (req.session.user) {
+
+		var new_Cluster = req.body.newCluster;
+		console.log("????"+new_Cluster);
+		//create new cluster
+		var clusterData = { 
+			clustername: new_Cluster,
+			users:[]
+		};
+		var newCluster = new Cluster(clusterData).save(function (err){
+			//create new Moderator
+			console.log(">>>>>>>>>>>>>>>>>>>>>");
+			var userData = { 
+				cluster: new_Cluster,
+				username: new_Cluster,
+				password: 'admin',
+				image: 'http://leadersinheels.com/wp-content/uploads/facebook-default.jpg', //default image
+				bio: 'Hello, this is my bio!',
+				hidden: false,
+				type: 'Moderator'
+			};
+			var newUser = new User(userData).save(function (err){
+
+				console.log('New Moderator has been created!');
+				res.redirect('/');
+
+			});
+
+		});
+	// Not logged in
+	} else {
+		res.redirect('/login');
+	}
+});
+
 // post new posts
 app.post('/statuses', function (req, res) {
 
@@ -354,14 +408,15 @@ app.post('/statuses', function (req, res) {
 			var status = req.body.status;
 			var username = req.session.user.username;
 			var pic = req.session.user.image;
+			var cluster = req.session.user.cluster;
 			var statusData = { 
 				body: status,
 				time: new Date().getTime(),
 				username: username,
 				image: pic,
-				comments: [],
-				likes: []
+				cluster: cluster
 			};
+			
 			var newStatus = new Status(statusData).save(function (err) {
 				console.log('User has posted a new status');
 				io.sockets.emit('newStatus', {statusData: statusData});

@@ -1,70 +1,222 @@
 <!DOCTYPE html>
-<html class="no-js"> <!--<![endif]-->
-    <head>
 
-        <meta charset="utf-8">
-        <title>nodebook</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
-        <link rel="stylesheet" href="/css/normalize.min.css">
-        <link rel="stylesheet" href="/css/main.css">
-        <script src="/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script>
+    var myname = "<%= currentUser.username %>";
+</script>
+<%
+if (user.username == currentUser.username) { 
+    var isMe = true;
+} else {
+    var isMe = false;
+}
+%>
 
-        <!-- jQuery library -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<html>
+<head>
+    <link rel="stylesheet" href="/css/new.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-        <!-- Latest compiled JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    </head>
-    <body>
-        <div class="header-container">
-            <header class="wrapper ">
-                <a href="/"><img src="/img/nodebook.png" id="logo"/></a>
-                <div id="rightside">
-					
-				</div>
-            </header>
-        </div>
-        <div class="main-container">
-            <div class="main wrapper clearfix">
-                <!-- body -->
-                <div class="row">
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-                    <div class="col-md-4">
-                        
-                    </div>
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+<body>
 
-    				<div class="col-md-8">
-    					<h2>List of User</h2>
-    					<div id="UserList">
-                            <table>
-                                <tr><td>1111</td></tr>
-                                <tr><td>13333</td></tr>
-                                <tr><td>55555</td></tr>
-                            </table>
-    					</div>
-    					<h2>List of Status</h2>
-    					<div id="StatusList">
-    						<table>
-                                <tr><td>4444</td></tr>
-                                <tr><td>133444433</td></tr>
-                                <tr><td>55522255</td></tr>
-                            </table>
-    					</div>
-    				</div>
 
+    <div class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-collapse navbar-collapse-1 collapse" aria-expanded="true">
+                <ul class="nav navbar-nav">
+                    <li class="active">
+                        <a href="/"><span class="glyphicon glyphicon-home"></span> Home</a>
+                    </li>
+
+                </ul>
+                Moderator
+                <div class="navbar-form navbar-right">
+                        <div id="rightside">
+                            <a id="user" href="/users/<%= currentUser.username %>">
+                                Hi, 
+                                <span id="username"><%= currentUser.username %> </span>
+                                <img id="userpic" src="<%= currentUser.image %>" style="max-height:30px; max-width:100%;"/>
+                            </a>
+                            <a href="/logout" id="logout"> Logout</a>
+                        </div>
                 </div>
-                <!-- body -->
             </div>
         </div>
+    </div>
 
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="/js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
-        <script src="/js/vendor/jquery.timeago.js"></script>
-        <script src="/js/main.js"></script>
-    </body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <a href="#"><img class="img-responsive" alt="" src="<%= currentUser.image%>"></a>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <b><%= user.username %></b><text class="text-muted"> <i>in <%= user.cluster %></text></i>
+                            </div>
+                        </div>
+                        <% if (isMe) { %> 
+                        <form method="POST" action="/profile">
+                            Image<br>
+                            <input name="image" type="text" id="image" value="<%=user.image%>"/><br>
+                            Bio<br>
+                            <textarea id="bio" name="bio"><%= user.bio %></textarea><br><br>
+                            <input class="sub" type="submit" value="Update">
+                        </form>
+                        <% } else { %>
+                            <%= user.bio %>
+                        <% } %>
+
+
+                    </div>
+                </div>
+
+                <div class="panel panel-default panel-custom">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Cluster Lists
+                        </h3>
+                    </div>
+                    
+                    
+                    <div class="panel-body">
+                        <ul >
+                            <% if(cluster) {%>
+                                <% for (var i=0;i<cluster.length;i++) { %>
+                                    <li><a href="/users/<%=cluster[i].clustername%>"><%= cluster[i].clustername %></a></li>
+                                <% } %>
+                            <% } %>
+                        </ul>
+                    </div>
+                    <div class="panel-footer">
+                        <form action="/cluster" method="POST">
+                        <input type="text" name="newCluster">
+                        <input class="sub" type="submit" value="Add"/>
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <% if (isMe) { %>
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <a class="media-left" href="#fake">
+                                    <img alt="" class="media-object img-rounded" src="<%=user.image%>" style="height:40px; width:100%;">
+                                </a>
+                            </div>
+                            <div class="col-sm-10">
+                                <div class="form-group has-feedback">
+                                    <form action="/statuses"  id="postNewStatus" method="POST">
+                                        <input class="form-control" id="search2" name="status" placeholder="What's your status?"/>
+                                        <input class="sub" type="submit" value="Post"/>
+                                    </form>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                    <div class="panel-body">
+
+                    <% for (var i=0;i<statuses.length;i++) { %>
+
+                        <div class="media row">
+                            <div class="col-md-2">
+                        <a class="media-left" href="#fake">
+                            <img alt="" class="media-object img-rounded" src="<%= statuses[i].image %>" style="height:40px; width:100%;">
+                        </a>
+                            </div>
+                            <div class="media-body">
+                                <a href="/users/<%=statuses[i].username%>">
+                                <h4 class="media-heading"><b><%= statuses[i].username %></b><text class="text-muted"> <i>in <%= statuses[i].cluster %></text></i></h4></a>
+                                <p><%= statuses[i].body %></p>
+                                <ul class="nav nav-pills nav-pills-custom">
+                                    <li><a href="#"><span class="glyphicon glyphicon-share-alt"></span></a></li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-retweet"></span></a></li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-star"></span></a></li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-option-horizontal"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    <% } %>
+
+                        
+                    </div>
+                </div>
+
+                <br>
+                <br>
+
+            </div>
+
+            <div class="col-sm-3">
+                <div class="panel panel-default panel-custom">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Message
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="media">
+                            <div class="media-left">
+                                <img src="http://placehold.it/32x32" alt="" class="media-object img-rounded">
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading">Nome e cognome</h4>
+                                <a href="#" class="btn btn-default btn-xs">
+                                    <span class="glyphicon glyphicon-user"></span>
+                                    Visit
+                                </a>
+                            </div>
+                        </div>
+                        <div class="media">
+                            <div class="media-left">
+                                <img src="http://placehold.it/32x32" alt="" class="media-object img-rounded">
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading">Nome e cognome</h4>
+                                <a href="#" class="btn btn-default btn-xs">
+                                    <span class="glyphicon glyphicon-user"></span>
+                                    Visit
+                                </a>
+                            </div>
+                        </div>
+                        <div class="media">
+                            <div class="media-left">
+                                <img src="http://placehold.it/32x32" alt="" class="media-object img-rounded">
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading">Nome e cognome</h4>
+                                <a href="#" class="btn btn-default btn-xs">
+                                    <span class="glyphicon glyphicon-user"></span>
+                                    Visit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+</body>
 </html>
+
 

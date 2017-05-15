@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html class="no-js"> <!--<![endif]-->
+    <head>
+
+        <meta charset="utf-8">
+        <title>nodebook</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/css/normalize.min.css">
+        <link rel="stylesheet" href="/css/main.css">
+        <script src="/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="header-container">
+            <header class="wrapper ">
+                <a href="/"><img src="/img/nodebook.png" id="logo"/></a>
+                <div id="rightside">
+                    <a id="user" href="/users/<%= currentUser.username %>">
+                        <img id="userpic" src="<%= currentUser.image %>"/>
+                        <span id="username"><%= currentUser.username %></span>
+                    </a>
+                    <a href="/logout" id="logout">Logout</a>
+                </div>
+            </header>
+        </div>
+        <div class="main-container">
+            <div class="main wrapper clearfix">
+                <!-- body -->
+                <div class="row">
+
+                    <div class="col-md-4">
+                        
+                    </div>
+
+    				<div class="col-md-8">
+    					<h2>List of Cluster</h2>
+    					<div id="ClusterList" ">
+                            <table>
+                                <tr>
+                                    <td>
+                                        Cluster: 1111<br>
+                                        User:
+                                        <ul style="list-style-type: none;">
+                                            <li>333</li>
+                                            <li>4</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                    
+                                <tr>
+                                    <td>
+                                        Cluster: 13333<br>
+                                        User:
+                                        <ul style="list-style-type: none;">
+                                        <li>333</li>
+                                        <li>4</li>
+                                    </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Cluster: 55555<br>
+                                        User:
+                                        <ul style="list-style-type: none;">
+                                        <li>333</li>
+                                        <li>4</li>
+                                    </ul>
+                                    </td>
+                                </tr>
+                            </table>
+    					</div>
+    					
+    				</div>
+
+                </div>
+                <!-- body -->
+            </div>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="/js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+        <script src="/js/vendor/jquery.timeago.js"></script>
+        <script src="/js/main.js"></script>
+    </body>
+</html>
+
