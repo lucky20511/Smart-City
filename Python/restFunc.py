@@ -91,6 +91,7 @@ def getAllClusterAllUser() :
 
 @app.route("/users", methods = ["DELETE"])
 def deleteUser() : 
+    #TODO  UPDATE Cluster User List <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     username = request.args['username']
     result = db.Users.delete_one({"username":username})
     if result.delete_count() > 0:
@@ -100,12 +101,19 @@ def deleteUser() :
     return dumps(msg)
 
 @app.route("/createsysadmin", methods = ["POST"])
-def createAdmin() : #TODO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    result = db.Users.delete_one({"username":username})
-    if result.delete_count() > 0:
-        msg = {"msg": "succeed"}
-    else: 
-        msg = {"msg":"fail"}    
+def createAdmin() :
+    query = {
+        "username" : "sysadmin",
+        "password": "admin",
+        "type": "Sysadmin"
+    }  
+
+    result = db.Users.insert_one(query)
+    if result is None:
+        msg = {"msg": "fail"}
+    else:
+        msg = {"msg":"succeed"}
+
     return dumps(msg)
 
 # Status
@@ -114,7 +122,6 @@ def getAllClusterStatus() :
     clustername = request.args['cluster']
     # clustername = clusterDict['cluster']
     print(clustername)
-
     result = db.Clusters.find({"clustername":clustername}) #TODO WRONG query, Sort Status by Time<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     
     # print("RRRRROOOUUUUTTTEEEEE")
@@ -177,7 +184,16 @@ def createCluster() :
         }
         db.Clusters.insert_one(query)
 
-        signUp(clustername, "admin", clustername, "Moderator")
+        query = {
+                "username" : clustername,
+                "password": "admin",
+                "image": "",
+                "bio": "",
+                "cluster":clustername, 
+                "type": "Moderator"
+            }  
+        db.Users.insert_one(query)
+        db.Clusters.update_one({"clustername":clustername},{"$addToSet":{"users":clustername}},upsert=False)
 
         msg = {"msg":"succeed"}
     else:
@@ -186,15 +202,29 @@ def createCluster() :
     return dumps(msg)
 
 @app.route('/clusters', methods = ['DELETE'])
-def deleteCluster() :    
-    #TODO Cascading delete    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    # Need to get users array from Cluster
-    
+def deleteCluster() :
     clustername = request.args['clustername']
-    db.Clusters.delete_one({"clustername": clustername})
-    db.Users.delete_many({"cluster": clustername})
+
+    check = db.Clusters.find({"clustername":clustername})
+    if check is not None:
+        result = db.Users.find({"cluster":clustername})
+        if result is not None:
+            for c in result:
+                username = c['username']
+                print(username)
+                bulk = db.Status.initialize_unordered_bulk_op()
+                bulk.find({"username":username}).remove()
+                bulk_result = bulk.execute()
+                # print(dumps(bulk_result))
+                
+        else: print('NONE--------------------------------------------------------')
+
+        db.Clusters.delete_one({"clustername": clustername})
+        db.Users.delete_many({"cluster": clustername})
+        msg = {"msg":"succeed"}
     
-    msg = {"msg":"succeed"}
+    else:
+        msg = {"msg":"fail"}
     return dumps(msg)
 
 @app.route('/clusters', methods = ['GET'])
@@ -213,22 +243,23 @@ def getACluster(clustername):
     result = db.Clusters.find_one({"clustername": clustername})
     print(dumps(result))    ################################################## JSON FORMAT <------------------
 
+@app.route('/test', methods = ['GET'])
 def test():
-    # getACluster("Cluster A")
-    createCluster("ClusterA")
-    # createCluster("Cluster B")
-    signUp("Pig", 1234, "ClusterA")
+    # getACluster("ClusterA")
+    createCluster()
+    # createCluster("ClusterB")
+    signUp("Ass", 1234, "ClusterC")
+    signUp("Tiger", 1234, "ClusterC")
+    signUp("Mike", 1234, "ClusterC")
     # signUp("George", 1234, "Cluster A")
     # signUp("Bob", 1234, "Cluster A")
     # signUp("Mary", 1234, "Cluster B")
     # signUp("Lisa", 1234, "Cluster B")
 
-    createStatus("Jeremy", 1, "AAAAAAAAA", "")
-    createStatus("George", 2, "BBBBBBBBB", "")
+    createStatus("Ass", 10, "AAAAAAAAA", "")
+    createStatus("Tiger", 11, "BBBBBBBBB", "")
+    createStatus("Tiger", 12, "BBBBBBBBB", "")
     # createStatus("Bob", 3, "CCCCCCCCC", "")
-    # createStatus("Lisa", 4, "FFFFFFFF", "")
-    # createStatus("Lisa", 5, "DDDDDDDD", "")
-
 
 
 if __name__ ==  "__main__":
