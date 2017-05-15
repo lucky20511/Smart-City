@@ -21,9 +21,6 @@ Clusters = db['clusters']
 # Error Handling
 
 
-# @app.route("/v1/expenses/<expense_id>", methods = ["GET", "PUT", "DELETE"])
-# @app.route('/locations/<int:postID>', methods = ['GET', 'PUT', 'DELETE'])
-
 # User
 @app.route("/login", methods = ["POST"])
 def login():
@@ -39,7 +36,7 @@ def login():
     else:
         msg = {"msg":"succeed"}
     
-    return msg
+    return dumps(msg)
 
 @app.route("/signup", methods = ["POST"])
 def signUp() :     
@@ -66,7 +63,7 @@ def signUp() :
     else:
         msg = {"msg":"fail"}
     
-    return msg
+    return dumps(msg)
 
 @app.route("/users", methods = ["GET"])
 def getClusterAllUser() : 
@@ -83,13 +80,14 @@ def getClusterAllUser() :
      
     return dumps(msg)
 
-
+@app.route("/allclusters", methods = ["GET"])
 def getAllClusterAllUser() : 
+
     result = db.Users.find()
     for c in result:
         print(c)
-        msg = {} #TODO return JSON<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    return msg
+        msg = {} #TODO return JSON<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    return dumps(msg)
 
 @app.route("/users", methods = ["DELETE"])
 def deleteUser() : 
@@ -101,13 +99,14 @@ def deleteUser() :
         msg = {"msg":"fail"}    
     return dumps(msg)
 
+@app.route("/createsysadmin", methods = ["POST"])
 def createAdmin() : #TODO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     result = db.Users.delete_one({"username":username})
     if result.delete_count() > 0:
         msg = {"msg": "succeed"}
     else: 
         msg = {"msg":"fail"}    
-    return msg
+    return dumps(msg)
 
 # Status
 @app.route('/posts', methods = ['GET'])
@@ -117,7 +116,10 @@ def getAllClusterStatus() :
     print(clustername)
 
     result = db.Clusters.find({"clustername":clustername}) #TODO WRONG query, Sort Status by Time<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    
     # print("RRRRROOOUUUUTTTEEEEE")
+    # for doc in collection.find().sort('field', pymongo.ASCENDING):
+    # print(doc)
     if result is None: 
         msg = {"msg":"fail"}
     else:
@@ -161,9 +163,13 @@ def deleteStatus() :
     return dumps(msg)
 
 # Cluster
-def createCluster(clustername) : 
+@app.route('/clusters', methods = ['POST'])
+def createCluster() : 
     
+    p_body = json.loads(request.data)
+    clustername = p_body["clustername"]
     check = db.Clusters.find_one({"clustername": clustername})
+
     if check is None:
         query = {
             "clustername" : clustername,
@@ -174,20 +180,24 @@ def createCluster(clustername) :
         signUp(clustername, "admin", clustername, "Moderator")
 
         msg = {"msg":"succeed"}
-        return msg
     else:
         msg = {"msg":"fail"}
-        return msg
+    
+    return dumps(msg)
 
-def deleteCluster(clustername) :    
+@app.route('/clusters', methods = ['DELETE'])
+def deleteCluster() :    
     #TODO Cascading delete    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     # Need to get users array from Cluster
+    
+    clustername = request.args['clustername']
     db.Clusters.delete_one({"clustername": clustername})
     db.Users.delete_many({"cluster": clustername})
     
     msg = {"msg":"succeed"}
-    return msg
+    return dumps(msg)
 
+@app.route('/clusters', methods = ['GET'])
 def getAllCluster() : 
     result = db.Clusters.find() 
     if result.count() > 0:    
@@ -197,7 +207,7 @@ def getAllCluster() :
     else:
         msg = {"msg":"fail"}
 
-    return msg
+    return dumps(msg)   #TODO<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< RETURN JSON
 
 def getACluster(clustername):
     result = db.Clusters.find_one({"clustername": clustername})
