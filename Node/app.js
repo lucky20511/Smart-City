@@ -44,7 +44,7 @@ var User = mongoose.model('User', {
 });
 
 var Cluster = mongoose.model('Cluster', {
-	cluster:String,
+	clustername:String,
 	users:Array
 });
 
@@ -77,7 +77,9 @@ app.get('/', function (req, res) {
 	// Already logged in
 	if (req.session.user){
 		Status.find({}).sort({time: -1}).exec(function (err, statuses){
-			res.render('homepage', {user: req.session.user, statuses: statuses});
+			//res.render('homepage', {user: req.session.user, statuses: statuses});
+
+			res.redirect(path.join('/users/'+req.session.user.username));
 		});
 	// Not logged in
 	} else {
@@ -110,11 +112,101 @@ app.get('/login', function (req, res) {
 	if (req.query.error2) {
 		error2 = "Sorry please try again";
 	}
+	var clusterData = { 
+		clustername: "fire",
+		users:[]
+	};
+	var newCluster = new Cluster(clusterData).save(function (err){
 
-	res.render('login', {error1: error1, error2: error2});
+
+	});
+
+	Cluster.find({}).exec(function (err, clusters){
+		//res.render('homepage', {user: req.session.user, statuses: statuses});
+		if(err){
+			console.log(err);
+		}
+		
+		console.log(clusters);
+		res.render('login', {error1: error1, error2: error2, cluster:clusters});
+	});
+
+
+	// var cursor = Cluster.find({});
+	// console.log("!!!");
+	// console.log(cursor);
+	//res.render('login', {error1: error1, error2: error2, cluster:cursor});
+	// res.render('login', {error1: error1, error2: error2, cluster:[]});
 
 });
 
+
+// update other user's profile
+app.get('/moderator', function (req, res) {
+
+	res.render('moderator');
+	// Already logged in
+	// if (req.session.user) {
+	
+	// 	var username = req.session.user.username;
+	// 	var query = {username: username};
+
+	// 	var newBio = req.body.bio;
+	// 	var newImage = req.body.image;
+
+	// 	var change = {bio: newBio, image: newImage};
+
+	// 	User.update(query, change, function (err, user) {
+
+	// 		Status.update(query, {image: newImage}, {multi: true}, function(err, statuses){
+				
+	// 			console.log('Username has updated their profile');
+	// 			req.session.user.bio = newBio;
+	// 			req.session.user.image = newImage;
+	// 		    res.redirect(path.join('/users/'+username));
+	// 		});
+
+	// 	});
+	// 	res.render('moderator');
+	// // Not logged in
+	// } else {
+	// 	res.redirect('/login');
+	// }
+});
+
+
+// update other user's profile
+app.get('/sysadmin', function (req, res) {
+
+	res.render('sysadmin');
+	// Already logged in
+	// if (req.session.user) {
+	
+	// 	var username = req.session.user.username;
+	// 	var query = {username: username};
+
+	// 	var newBio = req.body.bio;
+	// 	var newImage = req.body.image;
+
+	// 	var change = {bio: newBio, image: newImage};
+
+	// 	User.update(query, change, function (err, user) {
+
+	// 		Status.update(query, {image: newImage}, {multi: true}, function(err, statuses){
+				
+	// 			console.log('Username has updated their profile');
+	// 			req.session.user.bio = newBio;
+	// 			req.session.user.image = newImage;
+	// 		    res.redirect(path.join('/users/'+username));
+	// 		});
+
+	// 	});
+	// 	res.render('moderator');
+	// // Not logged in
+	// } else {
+	// 	res.redirect('/login');
+	// }
+});
 
 // view other user's profile
 app.get('/users/:username', function (req, res) {
@@ -131,6 +223,14 @@ app.get('/users/:username', function (req, res) {
 			if (err || !user) {
 				res.send('No user found by id %s',username);
 			} else {
+
+
+				//TODO decide if which type of user  and route to different page
+				//type ==>  user -> profile
+				//			moderator -> moderator
+				//			sysadmin --> admin
+
+
 				Status.find(query).sort({time: -1}).exec(function(err, statuses){
 					res.render('profile', {
 						user: user, 
@@ -147,12 +247,14 @@ app.get('/users/:username', function (req, res) {
 	}
 });
 
+
 /***************************/
 /***   Form Submission   ***/
 /***************************/
 app.post('/login', function (req, res) {
 	var username = req.body.username.toLowerCase();
 	var password = req.body.password;
+
 
 	var query = {username: username, password: password};
 
@@ -196,6 +298,7 @@ app.post('/signup', function (req, res){
 					image: 'http://leadersinheels.com/wp-content/uploads/facebook-default.jpg', //default image
 					bio: 'Im new to NodeBook!',
 					hidden: false,
+					type: 'User',
 					wall: []
 				};
 				var newUser = new User(userData).save(function (err){

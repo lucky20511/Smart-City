@@ -20,11 +20,14 @@
         <div class="main-container">
             <div class="main wrapper clearfix">
             	 <!-- body -->
-
-
             	 <article class="centerme">
 					<h1 class="no-margin-top">Login</h1>
 					<% if (error2) { %> <div class="error"><%= error2 %></div><% } %>
+					
+					<% for (var i=0;i<cluster.length;i++) { %>
+						<%= cluster %>
+
+					<% } %>
 					<form action="/login" method="POST">
 						<input type="text" name="username" placeholder="username"/><br>
 					    <input type="password" name="password" placeholder="password"/><br>
