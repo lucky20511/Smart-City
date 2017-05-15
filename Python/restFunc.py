@@ -2,7 +2,7 @@
 from flask import Flask, request, Response, json, abort
 # import requests 
 from pymongo import MongoClient
-import pprint
+
 import bson
 from bson.json_util import dumps
 
@@ -16,7 +16,6 @@ Status = db['status']
 Clusters = db['clusters']
 
 # TODO 
-# Cascading Delete
 # Return msg format
 # Error Handling
 
@@ -91,13 +90,17 @@ def getAllClusterAllUser() :
 
 @app.route("/users", methods = ["DELETE"])
 def deleteUser() : 
-    #TODO  UPDATE Cluster User List <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     username = request.args['username']
+    
+    user = db.Users.find_one({'username':username})
+    cluster = user['cluster']
     result = db.Users.delete_one({"username":username})
+    db.Clusters.update_one({"clustername":cluster},{"$pull":{"users":username}},upsert=False)
     if result.delete_count() > 0:
         msg = {"msg": "succeed"}
     else: 
         msg = {"msg":"fail"}    
+
     return dumps(msg)
 
 @app.route("/createsysadmin", methods = ["POST"])
@@ -122,23 +125,32 @@ def getAllClusterStatus() :
     clustername = request.args['cluster']
     check = db.Clusters.find({"clustername":clustername}) #TODO Sort Status by Time<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    # for doc in collection.find().sort('field', pymongo.ASCENDING):
+    # for doc in collection.find().sort('field', 1):
     check = db.Clusters.find({"clustername":clustername})
+    db.temp.drop()
+    temp = db['temp']
+
     if check is not None:
         result = db.Users.find({"cluster":clustername})
-        if result is not None:
+        if result.count() > 0:
             for c in result:
                 username = c['username']
                 status_result = db.Status.find({"username":username})
                 if status_result.count() > 0:
                     for c in status_result:
-                        print(dumps(c))
-                # print(dumps(status_result))
-                msg = {"msg":"succeed"}
+                        db.temp.insert(c)
                 
-    else: 
+                    ans = db.temp.find().sort('time',-1)
+                    msg = ans   
+        
+        else:
+            msg = {"msg":"fail"}
+                
+    else:
         msg = {"msg":"fail"}
 
+    # db.temp.drop()
+    # print(msg)
     return dumps(msg)
 
 @app.route('/posts', methods = ['POST'])
