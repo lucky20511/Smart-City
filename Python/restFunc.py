@@ -120,18 +120,25 @@ def createAdmin() :
 @app.route('/posts', methods = ['GET'])
 def getAllClusterStatus() : 
     clustername = request.args['cluster']
-    # clustername = clusterDict['cluster']
-    print(clustername)
-    result = db.Clusters.find({"clustername":clustername}) #TODO WRONG query, Sort Status by Time<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    
-    # print("RRRRROOOUUUUTTTEEEEE")
+    check = db.Clusters.find({"clustername":clustername}) #TODO Sort Status by Time<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
     # for doc in collection.find().sort('field', pymongo.ASCENDING):
-    # print(doc)
-    if result is None: 
+    check = db.Clusters.find({"clustername":clustername})
+    if check is not None:
+        result = db.Users.find({"cluster":clustername})
+        if result is not None:
+            for c in result:
+                username = c['username']
+                status_result = db.Status.find({"username":username})
+                if status_result.count() > 0:
+                    for c in status_result:
+                        print(dumps(c))
+                # print(dumps(status_result))
+                msg = {"msg":"succeed"}
+                
+    else: 
         msg = {"msg":"fail"}
-    else:
-        msg = {"msg":"succeed"}
-    
+
     return dumps(msg)
 
 @app.route('/posts', methods = ['POST'])
