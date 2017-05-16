@@ -42,14 +42,16 @@ def signUp() :
     username = p_body["username"]
     password = str(p_body["password"])
     cluster = p_body["cluster"]
+    image = p_body['image']
+    bio = p_body['bio']
 
     check = db.Users.find_one({"username":username})
     if check is None:
         query = {
                 "username" : username,
                 "password": password,
-                "image": "",
-                "bio": "",
+                "image": image,
+                "bio": bio,
                 "cluster":cluster, 
                 "type": "User"
             }  
