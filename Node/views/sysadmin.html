@@ -40,7 +40,7 @@ if (user.username == currentUser.username) {
 							<a id="user" href="/users/<%= currentUser.username %>">
 								Hi, 
 								<span id="username"><%= currentUser.username %> </span>
-								<img id="userpic" src="<%= currentUser.image %>" style="max-height:30px; max-width:100%;"/>
+								<img id="userpic" src="<%= currentUser.image %>" style="max-height:30px;"/>
 							</a>
 							<a href="/logout" id="logout"> Logout</a>
 						</div>
@@ -54,19 +54,19 @@ if (user.username == currentUser.username) {
 			<div class="col-sm-3">
 				<div class="panel panel-default">
 					<div class="panel-body">
-						<a href="#"><img class="img-responsive" alt="" src="<%= currentUser.image%>"></a>
+						<a href="#"><img class="img-responsive" alt="" src="<%= user.image%>"></a>
 						<div class="row">
 							<div class="col-xs-12">
-								<b><%= user.username %></b><text class="text-muted"> <i>in <%= user.cluster %></text></i>
+								<b><%= user.username %></b><text class="text-muted"> in <%= user.cluster %></text>
 							</div>
 						</div>
 						<% if (isMe) { %> 
 					    <form method="POST" action="/profile">
 					    	Image<br>
-							<input name="image" type="text" id="image" value="<%=user.image%>"/><br>
+							<input class="form-control" name="image" type="text" id="image" value="<%=user.image%>"/><br>
 							Bio<br>
-							<textarea id="bio" name="bio"><%= user.bio %></textarea><br><br>
-							<input class="sub" type="submit" value="Update">
+							<textarea class="form-control" id="bio" name="bio"><%= user.bio %></textarea><br><br>
+							<input class="btn btn-primary btn-sm" type="submit" value="Update">
 						</form>
 						<% } else { %>
 							<%= user.bio %>
@@ -96,11 +96,36 @@ if (user.username == currentUser.username) {
                     <div class="panel-footer">
                         <form action="/cluster" method="POST">
                         <input type="text" name="newCluster">
-                        <input class="sub" type="submit" value="Add"/>
+                        <input class="btn btn-primary" type="submit" value="Add"/>
                         </form>
                     </div>
 					
 				</div>
+
+                <div class="panel panel-default panel-custom">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            User Lists
+                        </h3>
+                    </div>
+                    
+                    
+                    <div class="panel-body">
+                        <ul >
+                            <% if(users) {%>
+                                <% for (var i=0;i<users.length;i++) { %>
+                                    <li><a href="/users/<%=users[i].username%>"><%= users[i].username %></a></li>
+                                <% } %>
+                            <% } %>
+                        </ul>
+                    </div>
+                    <div class="panel-footer">
+
+                    </div>
+                    
+                </div>
+
+
 			</div>
 			<div class="col-sm-6">
 				<div class="panel panel-info">
@@ -108,15 +133,14 @@ if (user.username == currentUser.username) {
                         <% if (isMe) { %>
 						<div class="row">
 							<div class="col-sm-2">
-								<a class="media-left" href="#fake">
-									<img alt="" class="media-object img-rounded" src="<%=user.image%>" style="height:40px; width:100%;">
-								</a>
+								<a class="media-left" href="/users/<%= currentUser.username%>">
+									<img alt="" class="media-object img-rounded" src="<%=user.image%>" style="height:40px"></a>
 							</div>
 							<div class="col-sm-10">
 								<div class="form-group has-feedback">
     								<form action="/statuses"  id="postNewStatus" method="POST">
     									<input class="form-control" id="search2" name="status" placeholder="What's your status?"/>
-    									<input class="sub" type="submit" value="Post"/>
+    									<input class="btn btn-primary" type="submit" value="Post"/>
     								</form>
 									
 								</div>
@@ -132,11 +156,11 @@ if (user.username == currentUser.username) {
 							<div class="col-md-2">
 
 						<a class="media-left" href="/users/<%=statuses[i].username%>">
-							<img alt="" class="media-object img-rounded" src="<%= statuses[i].image %>" style="height:40px; width:100%;">
+							<img alt="" class="media-object img-rounded" src="<%= statuses[i].image %>" style="height:40px;">
 						</a>
 							</div>
 							<div class="media-body">
-								<a class="media-left" href="/users/<%=statuses[i].username%>"><h4 class="media-heading"><b><%= statuses[i].username %></b><text class="text-muted"> <i>in <%= statuses[i].cluster %></text></i></h4></a>
+								<a class="media-left" href="/users/<%=statuses[i].username%>"><h4 class="media-heading"><b><%= statuses[i].username %></b><text class="text-muted"> in <%= statuses[i].cluster %></text></h4></a>
 								<p><%= statuses[i].body %></p>
 								<ul class="nav nav-pills nav-pills-custom">
 									<li><a href="#"><span class="glyphicon glyphicon-share-alt"></span></a></li>
@@ -165,45 +189,39 @@ if (user.username == currentUser.username) {
 						</h3>
 					</div>
 					<div class="panel-body">
-						<div class="media">
-							<div class="media-left">
-								<img src="http://placehold.it/32x32" alt="" class="media-object img-rounded">
-							</div>
-							<div class="media-body">
-								<h4 class="media-heading">Nome e cognome</h4>
-								<a href="#" class="btn btn-default btn-xs">
-									<span class="glyphicon glyphicon-user"></span>
-									Visit
-								</a>
-							</div>
-						</div>
-						<div class="media">
-							<div class="media-left">
-								<img src="http://placehold.it/32x32" alt="" class="media-object img-rounded">
-							</div>
-							<div class="media-body">
-								<h4 class="media-heading">Nome e cognome</h4>
-								<a href="#" class="btn btn-default btn-xs">
-									<span class="glyphicon glyphicon-user"></span>
-									Visit
-								</a>
-							</div>
-						</div>
-						<div class="media">
-							<div class="media-left">
-								<img src="http://placehold.it/32x32" alt="" class="media-object img-rounded">
-							</div>
-							<div class="media-body">
-								<h4 class="media-heading">Nome e cognome</h4>
-								<a href="#" class="btn btn-default btn-xs">
-									<span class="glyphicon glyphicon-user"></span>
-									Visit
-								</a>
-							</div>
-						</div>
+
+                        <% for (var i=0;i<messages.length;i++) { %>
+
+    						<div class="media">
+    							<div class="media-left">
+                                    <a href="/users/<%=messages[i].from%>">
+    								<img src="<%=messages[i].image%>" alt="" class="media-object img-rounded" style="max-height:30px;">
+                                    </a>
+    							</div>
+    							<div class="media-body">
+                                    <!-- <p><%=messages[i].from%></p> -->
+    								<p><%=messages[i].body%></p>
+    							</div>
+    						</div>
+                        <% } %>
+
 					</div>
 					<div class="panel-footer">
-						<br>
+                        <% if(isMe) { %>
+                            <form method="POST" action="/message">
+                                <label for="sel1">To:</label>
+                                  <select class="form-control" id="sel1" name="to">
+                                    <% for (var i=0;i<allusers.length;i++) { %>
+                                        <option><%=allusers[i].username%></option>
+                                    <% } %>
+                                  </select>
+                                <input type="hidden" name="from" value="<%=user.username%>">
+                                <input type="hidden" name="image" value="<%=user.image%>">
+                                <label >Content:</label>
+                                <textarea class="form-control" id="bio" name="body"></textarea><br>
+                                <input class="btn btn-primary btn-sm" type="submit" value="Send">
+                            </form>
+                        <% } %>
 					</div>
 				</div>
 			</div>

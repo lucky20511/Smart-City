@@ -59,6 +59,15 @@ var Status = mongoose.model('Status', {
 	likes: Array,
 	cluster:String
 });
+
+
+var Message = mongoose.model('Message', {
+	body: String,
+	time: Number,
+	from: String,
+	to: String,
+	image: String
+});
 /************************/
 /*** RUN the Service  ***/
 /************************/
@@ -176,7 +185,7 @@ app.get('/users/:username', function (req, res) {
 		User.findOne(query, function (err, user) {
 
 			if (err || !user) {
-				res.send('No user found by id %s',username);
+				res.send('No user found by id');
 			} else {
 
 
@@ -204,12 +213,22 @@ app.get('/users/:username', function (req, res) {
 						console.log(clustername);
 						var query = { $or:[{cluster: user.cluster},{cluster: 'ALL'}]};
 						Status.find(query).sort({time: -1}).exec(function(err, statuses){
-							res.render('profile', {
-								user: user, 
-								statuses: statuses, 
-								currentUser: currentUser,
-								cluster: clustername
-							});	
+							
+							User.find({}).sort({time: -1}).exec(function(err, allusers){
+								
+								Message.find({to: user.username}).sort({time: -1}).exec(function(err, messages){
+								
+									res.render('profile',{
+										messages: messages,
+										allusers: allusers,
+										user: user, 
+										statuses: statuses, 
+										currentUser: currentUser,
+										cluster: clustername
+									});
+								});
+							});
+
 						});
 					}else if(user.type === 'Moderator'){
 						//get the list of user and the list of status
@@ -218,13 +237,27 @@ app.get('/users/:username', function (req, res) {
 						console.log(clustername);
 						var query = { $or:[{cluster: user.username}]};
 						Status.find(query).sort({time: -1}).exec(function(err, statuses){
-							res.render('moderator',{
-								user: user, 
-								statuses: statuses, 
-								currentUser: currentUser,
-								cluster: clustername
+							
+							User.find(query).sort({time: -1}).exec(function(err, users){
+								
+								User.find({}).sort({time: -1}).exec(function(err, allusers){
+
+									Message.find({to: user.username}).sort({time: -1}).exec(function(err, messages){
+								
+										res.render('moderator',{
+											messages: messages,
+											allusers: allusers,
+											users: users,
+											user: user, 
+											statuses: statuses, 
+											currentUser: currentUser,
+											cluster: clustername
+										});
+									});
+								});
 
 							});
+							
 						});
 					}else if((req.session.user.type === 'Sysadmin') &&  user.type === 'Sysadmin'){
 						//get the list of all clusters
@@ -232,24 +265,35 @@ app.get('/users/:username', function (req, res) {
 						console.log("@@@@@");
 						console.log(clustername);
 						Status.find(query).sort({time: -1}).exec(function(err, statuses){
-							res.render('sysadmin',{
-								user: user, 
-								statuses: statuses, 
-								currentUser: currentUser,
-								cluster: clustername
-
+							
+							User.find({}).sort({time: -1}).exec(function(err, users){
+								User.find({}).sort({time: -1}).exec(function(err, allusers){
+									Message.find({to: user.username}).sort({time: -1}).exec(function(err, messages){
+								
+										res.render('sysadmin',{
+											messages: messages,
+											allusers: allusers,
+											users: users,
+											user: user, 
+											statuses: statuses, 
+											currentUser: currentUser,
+											cluster: clustername
+										});
+									});
+								});
 							});
+
 						});
+					}else{
+						backURL=req.header('Referer') || '/';
+		  				res.redirect(backURL);	
 					}
-
-
 
 
 
 				});
 
 				
-
 				
 			}
 		});
@@ -361,7 +405,7 @@ app.post('/profile', function (req, res) {
 	}
 });
 
-// update other user's profile
+// create new cluster
 app.post('/cluster', function (req, res) {
 
 	// Already logged in
@@ -400,7 +444,7 @@ app.post('/cluster', function (req, res) {
 	}
 });
 
-// post new posts
+// create new cluster
 app.post('/statuses', function (req, res) {
 
 	// Already logged in
@@ -427,3 +471,38 @@ app.post('/statuses', function (req, res) {
 		res.redirect('/login');
 	}
 });
+
+
+
+app.post('/message', function (req, res) {
+
+	// Already logged in
+	if (req.session.user) {
+
+		var body = req.body.body;
+		var time = new Date().getTime();
+		var from = req.body.from;
+		var to = req.body.to;
+		var image = req.body.image;
+		//create new cluster
+		var message = { 
+			body: body,
+			time: time,
+			from: from,
+			to: to,
+			image: image
+		};
+
+		var newMessage = new Message(message).save(function (err){
+			//create new Moderator
+			console.log(">>>>>> new message created!!");
+			console.log(message);
+			res.redirect('/');
+
+		});
+	// Not logged in
+	} else {
+		res.redirect('/login');
+	}
+});
+
