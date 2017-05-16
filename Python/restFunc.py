@@ -154,6 +154,22 @@ def getAllClusterStatus() :
     
     return dumps(msg)
 
+@app.route('/posts_all', methods = ['GET'])
+def getAllClusterAllStatus() : 
+    db.temp_s.drop()
+    temp_s = db['temp_s']
+
+    result = db.Status.find()
+    if result is not None:
+        for i in result:
+            db.temp_s.insert(i)
+        ans = db.temp_s.find().sort('time',-1)
+        msg = ans
+    else:
+        msg = {"msg":"fail"} 
+      
+    return dumps(msg)    
+
 @app.route('/posts', methods = ['POST'])
 def createStatus() :
     p_body = json.loads(request.data)
