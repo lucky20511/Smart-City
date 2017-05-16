@@ -14,10 +14,9 @@ db = client.test_db
 Users = db['users']
 Status = db['status']
 Clusters = db['clusters']
+Messages = db['messages']
 
 # TODO 
-# Return msg format
-# Error Handling
 
 # User
 @app.route("/login", methods = ["POST"])
@@ -120,9 +119,8 @@ def createAdmin() :
 @app.route('/posts', methods = ['GET'])
 def getAllClusterStatus() : 
     clustername = request.args['cluster']
-    check = db.Clusters.find({"clustername":clustername})
+    check = db.Clusters.find_one({"clustername":clustername})
 
-    check = db.Clusters.find({"clustername":clustername})
     db.temp.drop()
     temp = db['temp']
 
@@ -151,7 +149,7 @@ def getAllClusterStatus() :
 def createStatus() :
     p_body = json.loads(request.data)
     username = p_body["username"]
-    time = p_body["time"]
+    time = str(p_body["time"])
     body = p_body["body"]
     image= p_body["image"]
 
@@ -216,6 +214,7 @@ def createCluster() :
 
 @app.route('/clusters', methods = ['DELETE'])
 def deleteCluster() :
+    #TODO DELETE MESSAGES ------------------------------------------------------------------
     clustername = request.args['clustername']
 
     check = db.Clusters.find_one({"clustername":clustername})
@@ -250,9 +249,91 @@ def getAllCluster() :
 
     return dumps(msg) 
 
+@app.route('/messages', methods = ['POST'])
+def sendMessage() :
+    p_body = json.loads(request.data)
+
+    time = str(p_body["time"])
+    froms = p_body["from"]
+    to = p_body["to"]
+    body = p_body["body"]
+    image= p_body["image"]
+
+    check = db.Users.find_one({"username":to})
+    if check is not None:
+        query = {
+            "from" : froms,
+            "time": time,
+            "image": image,
+            "body": body,
+            "to": to
+        }  
+        result = db.Messages.insert_one(query)
+        if result is None:
+            msg = {"msg":"fail"}
+        else:    
+            msg = {"msg":"succeed"}
+    else:
+        msg = {"msg":"fail"}
+    
+    return dumps(msg)
+
+@app.route('/messages', methods = ['GET'])
+def getMessage() :
+    time = request.args["time"]
+    # print(time)
+    result = db.Messages.find_one({"time":time})
+    # print(str(result))
+    # print(dumps(result))
+    if result is not None:
+        msg = result
+    else:
+        msg = {"msg":"fail"}
+
+    return dumps(msg)
+
+@app.route('/messages_all', methods = ['GET'])
+def getAllMessage() :
+    username = request.args['to']
+    check = db.Users.find_one({"username":username})
+
+    db.temp_m.drop()
+    temp_m = db['temp_m']
+
+    if check is not None:
+        result = db.Messages.find({"to":username})
+        if result.count() > 0:
+            for c in result:
+                db.temp_m.insert(c)
+                ans = db.temp_m.find().sort('time',-1)
+                msg = ans           
+        else:
+            msg = {"msg":"fail"}
+                
+    else:
+        msg = {"msg":"fail"}
+
+    return dumps(msg)
+
+@app.route('/messages', methods = ['DELETE'])
+def deleteMessage() :
+    time = request.args['time']
+    check = db.Messages.find_one({'time':time})
+    if check is not None:
+        result = db.Messages.delete_one({'time':time})
+        if result is not None:
+            msg = {"msg":"succeed"}
+        else:
+            msg = {"msg":"fail"}    
+    else:
+        msg = {"msg":"fail"}
+        
+    return dumps(msg)
+
+################################ TEST ######################################
 def getACluster(clustername):
     result = db.Clusters.find_one({"clustername": clustername})
-    print(dumps(result))    ################################################## JSON FORMAT <------------------
+    print(dumps(result))    ##### JSON FORMAT <------------------
 
 @app.route('/test', methods = ['GET'])
 def test():
@@ -292,7 +373,7 @@ if __name__ ==  "__main__":
 # def getAllSubscription(): 
 
 ############   SCHEMA   #########################
-#      User = {
+#         User = {
 #             "username" : "....",
 #             "password": "....",
 #             "image": "....",
@@ -301,17 +382,26 @@ if __name__ ==  "__main__":
 #             "type":"User/Moderator/SystemAdmin"
 #         }
 
-#         #Cluster
+#         Cluster
 #         {
 #             "cluster":"....",
 #             "users":["alice", "george"]
 #         }
 
-#         #Status
+#         Status
 #         {
 #             "body": "....",
 #             "time": "....",
 #             "username": "....",
 #             "image": "...."
 #         }
-#     return json.dumps(js)
+#     
+#        Message
+#        {
+#            "body": "....",
+#            "time": "....",
+#            "from": "....",
+#            "to": "....",
+#            "image": "..."
+#        }
+
