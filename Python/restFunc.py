@@ -172,23 +172,25 @@ def getAllClusterStatus() :
 
     clusters = clustername.split(',')
 
-    for c in clusters:
-        check = db.Clusters.find_one({"clustername":c})
-        if check is None:
-            msg = {"msg":"fail"}
-            return dumps(msg)
+    # for c in clusters:
+    #     check = db.Clusters.find_one({"clustername":c})
+    #     if check is None:
+    #         print("*********************************************")
+    #         msg = {"msg":"fail"}
+    #         return dumps(msg)
 
     for i in clusters:
         result = db.Status.find({"cluster":i})
         if result.count() > 0:
             for j in result:
-                db.temp.insert(j)
-
-            ans = db.temp.find().sort('time',-1)
-            msg = ans        
+                db.temp.insert(j)       
         else:
+            print("////////////////////////////////////////////////////")
             msg = {"msg":"fail"}                
     
+    ans = db.temp.find().sort('time',-1)
+    msg = ans 
+
     return dumps(msg)
 
 @app.route('/posts_all', methods = ['GET'])
