@@ -55,9 +55,20 @@ def signUp() :
             }  
         db.Users.insert_one(query)
         db.Clusters.update_one({"clustername":cluster},{"$addToSet":{"users":username}},upsert=False)
-      
+        msg = {"msg":"succeed"}
     else:
         msg = {"msg":"fail"}
+    
+    return dumps(msg)
+
+@app.route("/user", methods = ["GET"])
+def getUser():
+    username = request.args['username']
+    result = db.Users.find_one({'username':username})
+    if result is not None:
+        msg = result
+    else:
+        msg = {'msg':'fail'}
     
     return dumps(msg)
 
