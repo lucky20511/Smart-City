@@ -92,7 +92,7 @@ def updateUser():
         if image is not None:
             db.Users.update_one({'username':username},{'$set':{'image':image}})
         if bio is not None:
-            db.Users.update_one({'username':username},{'bio':bio})
+            db.Users.update_one({'username':username},{'$set':{'bio':bio}})
         
         result = db.Users.find_one({'username':username})
         msg = result
