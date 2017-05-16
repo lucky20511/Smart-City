@@ -7,12 +7,15 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var ejs = require('ejs-locals');
+var request = require('request');
 // connect to MongoDB
-//ar db = 'nodebook';
-mongoose.connect('mongodb://localhost/nodebook');
+
+// mongoose.connect('mongodb://localhost/nodebook');
 
 // initialize our app
 var app = express();
+
+var REST_URL = 'http://0.0.0.0:1314';
 
 // app configuation
 app.set('views', path.join(__dirname,'views'));
@@ -34,40 +37,40 @@ app.use(require('express-session')({
 }));
 
 
-// create user model 
-var User = mongoose.model('User', {
-	username: String,
-	password: String,
-	image: String,
-	bio: String,
-	cluster:String,
-	type:String
-});
+// // create user model 
+// var User = mongoose.model('User', {
+// 	username: String,
+// 	password: String,
+// 	image: String,
+// 	bio: String,
+// 	cluster:String,
+// 	type:String
+// });
 
-var Cluster = mongoose.model('Cluster', {
-	clustername:String,
-	users:Array
-});
+// var Cluster = mongoose.model('Cluster', {
+// 	clustername:String,
+// 	users:Array
+// });
 
-// create post model
-var Status = mongoose.model('Status', {
-	body: String,
-	time: Number,
-	username: String,
-	image: String,
-	comments: Array,
-	likes: Array,
-	cluster:String
-});
+// // create post model
+// var Status = mongoose.model('Status', {
+// 	body: String,
+// 	time: Number,
+// 	username: String,
+// 	image: String,
+// 	comments: Array,
+// 	likes: Array,
+// 	cluster:String
+// });
 
 
-var Message = mongoose.model('Message', {
-	body: String,
-	time: Number,
-	from: String,
-	to: String,
-	image: String
-});
+// var Message = mongoose.model('Message', {
+// 	body: String,
+// 	time: Number,
+// 	from: String,
+// 	to: String,
+// 	image: String
+// });
 /************************/
 /*** RUN the Service  ***/
 /************************/
@@ -92,11 +95,11 @@ app.get('/', function (req, res) {
 	// Already logged in
 	if (req.session.user){
 
-
 		res.redirect(path.join('/users/'+req.session.user.username));
 		// Status.find({}).sort({time: -1}).exec(function (err, statuses){
 		// 	//res.render('homepage', {user: req.session.user, statuses: statuses});
 		// });
+
 	// Not logged in
 	} else {
 		res.redirect('login');
@@ -117,20 +120,15 @@ app.get('/logout', function (req, res) {
 
 app.get('/login', function (req, res) {
 
-	User.findOne({username:'sysadmin'}, function (err, user) {
-		if(err || !user){
-			var userData = { 
-					cluster: 'ALL',
-					username: 'sysadmin',
-					password: 'admin',
-					image: 'http://leadersinheels.com/wp-content/uploads/facebook-default.jpg', //default image
-					bio: 'Hello, this is my bio!',
-					hidden: false,
-					type: 'Sysadmin'
-			};
-			var newUser = new User(userData).save(function (err){});
-		}
+	var URL = REST_URL+"/createsysadmin";
+    console.log(URL);
+    request({
+	  uri: URL,
+	  method: "POST"
+	}, function(error, response, body) {
+	  console.log(body);
 	});
+	
 
 
 	var error1 = null;
@@ -144,29 +142,23 @@ app.get('/login', function (req, res) {
 	if (req.query.error2) {
 		error2 = "Sorry please try again";
 	}
-	// var clusterData = { 
-	// 	clustername: "fire",
-	// 	users:[]
-	// };
-	// var newCluster = new Cluster(clusterData).save(function (err){});
 
-	Cluster.find({}).exec(function (err, clusters){
-		//res.render('homepage', {user: req.session.user, statuses: statuses});
-		if(err){
-			console.log(err);
-		}
-		
-		console.log(clusters);
+
+	var URL = REST_URL+"/clusters";
+    console.log(URL);
+    request({
+	  uri: URL,
+	  method: "GET"
+	}, function(error, response, body) {
+		var ret = JSON.parse(body)
+	  	if(ret.msg){
+	  		clusters = [];
+	  	}else{
+	  		clusters = ret;
+	  	}
+	  	console.log(clusters);
 		res.render('login', {error1: error1, error2: error2, cluster:clusters});
 	});
-
-
-	// var cursor = Cluster.find({});
-	// console.log("!!!");
-	// console.log(cursor);
-	//res.render('login', {error1: error1, error2: error2, cluster:cursor});
-	// res.render('login', {error1: error1, error2: error2, cluster:[]});
-
 });
 
 
@@ -182,121 +174,211 @@ app.get('/users/:username', function (req, res) {
 		var query = {username: username};
 		var currentUser = req.session.user;
 
-		User.findOne(query, function (err, user) {
+		//get user
+	    console.log(REST_URL+"/user?username="+username);
+	    request({
+		  uri: REST_URL+"/user?username="+username,
+		  method: "GET"
+		}, function(error, response, body) {
+			var ret = JSON.parse(body)
+			var user;
+		  	if(ret.msg){user = [];}
+		  	else{user = ret;}
 
-			if (err || !user) {
-				res.send('No user found by id');
-			} else {
-
-
-				//TODO decide if which type of user  and route to different page
-				//type ==>  user -> profile
-				//			moderator -> moderator
-				//			sysadmin --> admin
-
+		  	//get clustername
+		  	request({
+			  uri: REST_URL+"/clusters",
+			  method: "GET"
+			}, function(error, response, body) {
+				var ret = JSON.parse(body)
+				console.log("QQQQQQQQQQQQQQQQQQQ");
+				console.log(ret);
 				var clustername;
-				Cluster.find({}).exec(function (err, clusters){
-					//res.render('homepage', {user: req.session.user, statuses: statuses});
-					if(err){
-						console.log(err);
-					}
-					clustername = clusters;
-				
-					console.log("!!!!!");
-					console.log(req.session.user);
+			  	if(ret.msg){ clustername = [];}
+			  	else{ clustername = ret;}
 
-					if(user.type === 'User'){
-						//current user only
-						//Status.find(query).sort({time: -1}).exec(function(err, statuses){
-						//all user
-						console.log("@@@@@");
-						console.log(clustername);
-						var query = { $or:[{cluster: user.cluster},{cluster: 'ALL'}]};
-						Status.find(query).sort({time: -1}).exec(function(err, statuses){
-							
-							User.find({}).sort({time: -1}).exec(function(err, allusers){
-								
-								Message.find({to: user.username}).sort({time: -1}).exec(function(err, messages){
-								
-									res.render('profile',{
+
+			  	if(user.type === 'User'){
+
+
+			  		//Get statuses
+			  		request({
+					  uri: REST_URL+"/posts?cluster=ALL,"+user.cluster,
+					  method: "GET"
+					}, function(error, response, body) {
+						var ret = JSON.parse(body)
+						var statuses;
+					  	if(ret.msg){ statuses = [];}
+					  	else{ statuses = ret;}
+
+					  	//Get allusers
+				  		request({
+						  uri: REST_URL+"/allclusters",
+						  method: "GET"
+						}, function(error, response, body) {
+							var ret = JSON.parse(body)
+							var allusers;
+						  	if(ret.msg){ allusers = [];}
+						  	else{ allusers = ret;}
+
+
+						  	//Get messages
+					  		request({
+							  uri: REST_URL+"/messages_all?to="+user.username,
+							  method: "GET"
+							}, function(error, response, body) {
+								var ret = JSON.parse(body)
+								var messages;
+							  	if(ret.msg){ messages = [];}
+							  	else{ messages = ret;}
+
+
+							  	res.render('profile',{
+									messages: messages,
+									allusers: allusers,
+									user: user, 
+									statuses: statuses, 
+									currentUser: currentUser,
+									cluster: clustername
+								});
+							 });
+						 });
+					 });
+
+			  	}else if(user.type === 'Moderator'){
+
+			  		console.log("EEEEEEEEEEEEEEEE");
+			  		console.log(REST_URL+"/posts?cluster=ALL,"+user.cluster);
+			  		//Get statuses
+			  		request({
+					  uri: REST_URL+"/posts?cluster=ALL,"+user.cluster,
+					  method: "GET"
+					}, function(error, response, body) {
+
+						var ret = JSON.parse(body)
+						console.log("EEEEEEEEEEEEEEEE");
+			  			console.log(ret);
+						var statuses;
+					  	if(ret.msg){ statuses = [];}
+					  	else{ statuses = ret;}
+
+
+					  	//Get users
+				  		request({
+						  uri: REST_URL+"/users?cluster="+user.cluster,
+						  method: "GET"
+						}, function(error, response, body) {
+							var ret = JSON.parse(body)
+							var users;
+						  	if(ret.msg){ users = [];}
+						  	else{ users = ret;}
+
+
+						  	//Get allusers
+					  		request({
+							  uri: REST_URL+"/allclusters",
+							  method: "GET"
+							}, function(error, response, body) {
+								var ret = JSON.parse(body)
+								var allusers;
+							  	if(ret.msg){ allusers = [];}
+							  	else{ allusers = ret;}
+
+
+							  	//Get messages
+						  		request({
+								  uri: REST_URL+"/messages_all?to="+user.username,
+								  method: "GET"
+								}, function(error, response, body) {
+									var ret = JSON.parse(body)
+									var messages;
+								  	if(ret.msg){ messages = [];}
+								  	else{ messages = ret;}
+
+
+								  	res.render('moderator',{
 										messages: messages,
 										allusers: allusers,
+										users: users,
 										user: user, 
 										statuses: statuses, 
 										currentUser: currentUser,
 										cluster: clustername
 									});
-								});
+								 });
 							});
+					  	});
+					 });
+			  	}else if((req.session.user.type === 'Sysadmin') &&  user.type === 'Sysadmin'){
+			  		//Get all statuses
+			  		request({
+					  uri: REST_URL+"/posts_all",
+					  method: "GET"
+					}, function(error, response, body) {
+						var ret = JSON.parse(body)
+						var statuses;
+					  	if(ret.msg){ statuses = [];}
+					  	else{ statuses = ret;}
 
-						});
-					}else if(user.type === 'Moderator'){
-						//get the list of user and the list of status
 
-						console.log("@@@@@");
-						console.log(clustername);
-						var query = { $or:[{cluster: user.username}]};
-						Status.find(query).sort({time: -1}).exec(function(err, statuses){
-							
-							User.find(query).sort({time: -1}).exec(function(err, users){
-								
-								User.find({}).sort({time: -1}).exec(function(err, allusers){
+					  	//Get users
+				  		request({
+						  uri: REST_URL+"/users?cluster="+user.cluster,
+						  method: "GET"
+						}, function(error, response, body) {
+							var ret = JSON.parse(body)
+							var users;
+						  	if(ret.msg){ users = [];}
+						  	else{ users = ret;}
 
-									Message.find({to: user.username}).sort({time: -1}).exec(function(err, messages){
-								
-										res.render('moderator',{
-											messages: messages,
-											allusers: allusers,
-											users: users,
-											user: user, 
-											statuses: statuses, 
-											currentUser: currentUser,
-											cluster: clustername
-										});
+
+						  	//Get allusers
+					  		request({
+							  uri: REST_URL+"/allclusters",
+							  method: "GET"
+							}, function(error, response, body) {
+								var ret = JSON.parse(body)
+								var allusers;
+							  	if(ret.msg){ allusers = [];}
+							  	else{ allusers = ret;}
+
+
+							  	//Get messages
+						  		request({
+								  uri: REST_URL+"/messages_all?to="+user.username,
+								  method: "GET"
+								}, function(error, response, body) {
+									var ret = JSON.parse(body)
+									var messages;
+								  	if(ret.msg){ messages = [];}
+								  	else{ messages = ret;}
+
+
+								  	res.render('sysadmin',{
+										messages: messages,
+										allusers: allusers,
+										users: allusers,
+										user: user, 
+										statuses: statuses, 
+										currentUser: currentUser,
+										cluster: clustername
 									});
-								});
-
+								 });
 							});
-							
-						});
-					}else if((req.session.user.type === 'Sysadmin') &&  user.type === 'Sysadmin'){
-						//get the list of all clusters
-						var query = {};
-						console.log("@@@@@");
-						console.log(clustername);
-						Status.find(query).sort({time: -1}).exec(function(err, statuses){
-							
-							User.find({}).sort({time: -1}).exec(function(err, users){
-								User.find({}).sort({time: -1}).exec(function(err, allusers){
-									Message.find({to: user.username}).sort({time: -1}).exec(function(err, messages){
-								
-										res.render('sysadmin',{
-											messages: messages,
-											allusers: allusers,
-											users: users,
-											user: user, 
-											statuses: statuses, 
-											currentUser: currentUser,
-											cluster: clustername
-										});
-									});
-								});
-							});
+					  	});
+					 });
 
-						});
-					}else{
-						backURL=req.header('Referer') || '/';
-		  				res.redirect(backURL);	
-					}
-
-
-
-				});
-
+			  	}else{
+			  		backURL=req.header('Referer') || '/';
+		  			res.redirect(backURL);	
+			  	}
 				
-				
-			}
+
+			});
+
+			
 		});
+
 	// Not logged in
 	} else {
 
@@ -313,20 +395,35 @@ app.post('/login', function (req, res) {
 	var password = req.body.password;
 
 
-	var query = {username: username, password: password};
-
-	User.findOne(query, function (err, user) {
-
-		if (err || !user) {
-			//Error 2 ==> Error msg for Log in
-			res.redirect('/login?error2=1');
-		} else {
-			req.session.user = user;
-			console.log('You have logged in');
-			res.redirect('/');
+	var URL = REST_URL+"/login";
+	var post_body = {
+		"username": req.body.username,
+		"password": req.body.password
+	};
+    console.log(URL);
+    console.log(req.body);
+    request.post({
+	  uri: URL,
+	  body: JSON.stringify(req.body)
+	}, function(err, response, body) {
+		if(err){
+			console.log("!!!!!! Error");
+			console.log(err);
 		}
-
+		console.log("!!!!!!");
+		console.log(response);
+		var ret = JSON.parse(body);
+		console.log(ret);
+	  	if(ret.msg){
+	  		res.redirect('/login?error2=1');
+	  	}else{
+	  		req.session.user = ret;
+	  		res.redirect('/');
+	  	}
+	  
 	});
+
+
 });
 
 
@@ -340,64 +437,77 @@ app.post('/signup', function (req, res){
 		res.redirect('/login?error1=1');
 	}
 	else {	
-		var query = {username: username};
-		User.findOne(query, function (err, user) {
+		var post_body = { 
+			cluster: clustername,
+			username: username,
+			password: password,
+			image: 'http://leadersinheels.com/wp-content/uploads/facebook-default.jpg', //default image
+			bio: 'Hello, this is my bio!',
+			type: 'User'
+		};
+		var URL = REST_URL+"/signup";
+	    console.log(req.body);
+	    request.post({
+		  uri: URL,
+		  body: JSON.stringify(post_body)
+		}, function(err, response, body) {
 			if(err){
+				console.log("!!!!!! Error");
 				console.log(err);
 			}
-
-			if (user) {
-				//Error 1 ==> Error msg for Sign Up
-				res.redirect('/login?error1=1');
-			} else {
-				var userData = { 
-					cluster: clustername,
-					username: username,
-					password: password,
-					image: 'http://leadersinheels.com/wp-content/uploads/facebook-default.jpg', //default image
-					bio: 'Hello, this is my bio!',
-					hidden: false,
-					type: 'User'
-				};
-				console.log(userData);
-				var newUser = new User(userData).save(function (err){
-
-					req.session.user = userData;
-					console.log('New user has been created!  type:'+req.session.user.type+" cluster:"+req.session.user.cluster);
-					res.redirect(path.join('/users/'+username));
-
-				});
-			}
+			console.log("!!!!!!");
+			console.log(response);
+			var ret = JSON.parse(body);
+			console.log(ret);
+		  	if(ret.msg){
+		  		res.redirect('/login?error1=1');
+		  	}else{
+		  		req.session.user = ret;
+		  		res.redirect(path.join('/users/'+username));
+		  	}
+		  
 		});
+
 	}
 });
 
 
-
+/////TODO
 // update other user's profile
 app.post('/profile', function (req, res) {
 
 	// Already logged in
 	if (req.session.user) {
 	
-		var username = req.session.user.username;
-		var query = {username: username};
 
 		var newBio = req.body.bio;
 		var newImage = req.body.image;
 
-		var change = {bio: newBio, image: newImage};
+		var post_body = {
+			"bio": newBio, 
+			"image": newImage
+		};
 
-		User.update(query, change, function (err, user) {
-
-			Status.update(query, {image: newImage}, {multi: true}, function(err, statuses){
-				
-				console.log('Username has updated their profile');
-				req.session.user.bio = newBio;
-				req.session.user.image = newImage;
-			    res.redirect(path.join('/users/'+username));
-			});
-
+		var URL = REST_URL+"/users?username="+req.session.user.username;
+	    console.log(req.body);
+	    request.put({
+		  uri: URL,
+		  body: JSON.stringify(req.body)
+		}, function(err, response, body) {
+			if(err){
+				console.log("!!!!!! Error");
+			}
+			console.log("ZZZZZZZZZ");
+			console.log(body);
+			var ret = JSON.parse(body);
+			console.log(ret);
+		  	if(ret.msg){
+		  		res.redirect('/');
+		  	}else{
+		  		req.session.user = ret;
+		  		res.redirect(path.join('/users/'+req.session.user.username));
+		  	}
+		  
 		});
 	// Not logged in
 	} else {
@@ -411,33 +521,32 @@ app.post('/cluster', function (req, res) {
 	// Already logged in
 	if (req.session.user) {
 
-		var new_Cluster = req.body.newCluster;
-		console.log("????"+new_Cluster);
-		//create new cluster
-		var clusterData = { 
-			clustername: new_Cluster,
-			users:[]
+		var URL = REST_URL+"/clusters";
+
+		var post_body = {
+			"clustername": req.body.newCluster
 		};
-		var newCluster = new Cluster(clusterData).save(function (err){
-			//create new Moderator
-			console.log(">>>>>>>>>>>>>>>>>>>>>");
-			var userData = { 
-				cluster: new_Cluster,
-				username: new_Cluster,
-				password: 'admin',
-				image: 'http://leadersinheels.com/wp-content/uploads/facebook-default.jpg', //default image
-				bio: 'Hello, this is my bio!',
-				hidden: false,
-				type: 'Moderator'
-			};
-			var newUser = new User(userData).save(function (err){
 
-				console.log('New Moderator has been created!');
-				res.redirect('/');
-
-			});
-
+		request.post({
+		  uri: URL,
+		  body: JSON.stringify(post_body)
+		}, function(err, response, body) {
+			if(err){
+				console.log("!!!!!! Error");
+				console.log(err);
+			}
+			console.log("!!!!!!");
+			console.log(response);
+			var ret = JSON.parse(body);
+			console.log(ret);
+		  	if(ret.msg){
+		  		res.redirect('/');
+		  	}else{
+		  		res.redirect('/');
+		  	}
+		  
 		});
+
 	// Not logged in
 	} else {
 		res.redirect('/login');
@@ -449,23 +558,41 @@ app.post('/statuses', function (req, res) {
 
 	// Already logged in
 	if (req.session.user) {
+
+			var URL = REST_URL+"/posts";
+
 			var status = req.body.status;
 			var username = req.session.user.username;
 			var pic = req.session.user.image;
 			var cluster = req.session.user.cluster;
-			var statusData = { 
+			var post_body = { 
 				body: status,
 				time: new Date().getTime(),
 				username: username,
 				image: pic,
 				cluster: cluster
 			};
-			
-			var newStatus = new Status(statusData).save(function (err) {
-				console.log('User has posted a new status');
-				io.sockets.emit('newStatus', {statusData: statusData});
-				res.redirect(path.join('/users/'+username));
+
+			request.post({
+			  uri: URL,
+			  body: JSON.stringify(post_body)
+			}, function(err, response, body) {
+				if(err){
+					console.log("!!!!!! Error");
+					console.log(err);
+				}
+				console.log("!!!!!!");
+				console.log(response);
+				var ret = JSON.parse(body);
+				console.log(ret);
+			  	if(ret.msg){
+			  		res.redirect(path.join('/users/'+username));
+			  	}else{
+			  		res.redirect(path.join('/users/'+username));
+			  	}
+			  
 			});
+
 	// Not logged in
 	} else {
 		res.redirect('/login');
@@ -479,13 +606,15 @@ app.post('/message', function (req, res) {
 	// Already logged in
 	if (req.session.user) {
 
+		var URL = REST_URL+"/messages";
+
 		var body = req.body.body;
 		var time = new Date().getTime();
 		var from = req.body.from;
 		var to = req.body.to;
 		var image = req.body.image;
 		//create new cluster
-		var message = { 
+		var post_body = { 
 			body: body,
 			time: time,
 			from: from,
@@ -493,13 +622,28 @@ app.post('/message', function (req, res) {
 			image: image
 		};
 
-		var newMessage = new Message(message).save(function (err){
-			//create new Moderator
-			console.log(">>>>>> new message created!!");
-			console.log(message);
-			res.redirect('/');
+		request.post({
+			  uri: URL,
+			  body: JSON.stringify(post_body)
+			}, function(err, response, body) {
+				if(err){
+					console.log("!!!!!! Error");
+					console.log(err);
+				}
+				console.log("!!!!!!");
+				console.log(response);
+				var ret = JSON.parse(body);
+				console.log(ret);
+			  	if(ret.msg){
+			  		res.redirect('/');
+			  		console.log(">>>>>> new message created!!");
+			  	}else{
+			  		console.log(">>>>>> new message created!!");
+					res.redirect('/');
+			  	}
+			  
+			});
 
-		});
 	// Not logged in
 	} else {
 		res.redirect('/login');
