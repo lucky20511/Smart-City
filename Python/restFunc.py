@@ -74,6 +74,34 @@ def getUser():
     
     return dumps(msg)
 
+@app.route("/users", methods = ["PUT"])
+def updateUser():
+    username = request.args['username']
+    p_body = json.loads(request.data)
+    if p_body.has_key('image'):
+        image = p_body['image']
+    else: 
+        image = None
+    if p_body.has_key('bio'):
+        bio = p_body['bio']
+    else:
+        bio = None
+        
+    check = db.Users.find_one({'username':username})
+    if check is not None:
+        if image is not None:
+            db.Users.update_one({'username':username},{'$set':{'image':image}})
+        if bio is not None:
+            db.Users.update_one({'username':username},{'bio':bio})
+        
+        result = db.Users.find_one({'username':username})
+        msg = result
+    
+    else:
+        msg = {'msg':'fail'}
+    
+    return dumps(msg)    
+
 @app.route("/users", methods = ["GET"])
 def getClusterAllUser() : 
     cluster = request.args['cluster']
@@ -228,8 +256,8 @@ def createCluster() :
         query = {
                 "username" : clustername,
                 "password": "admin",
-                "image": "",
-                "bio": "",
+                "bio" : "Hello, this is my bio!",
+                "image" : "http://leadersinheels.com/wp-content/uploads/facebook-default.jpg",
                 "cluster":clustername, 
                 "type": "Moderator"
             }  
