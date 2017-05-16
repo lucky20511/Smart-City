@@ -1,0 +1,99 @@
+<!--
+User Profile Sidebar by @keenthemes
+A component of Metronic Theme - #1 Selling Bootstrap 3 Admin Theme in Themeforest: http://j.mp/metronictheme
+Licensed under MIT
+-->
+<html ng-app="profileApp">
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script  src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="/stylesheets/profile-style.css"> </link>
+    <script src="javascripts/profile-operation.js"> </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.js"></script>
+
+</head>
+<body ng-controller="profileCtrl">
+<div class="container">
+    <div class="row profile">
+        <div class="col-md-3">
+            <div class="profile-sidebar">
+                <!-- SIDEBAR USERPIC -->
+                <div class="profile-userpic">
+                    <img src="/images/profilePic.jpg" class="img-responsive" alt="">
+                </div>
+                <!-- END SIDEBAR USERPIC -->
+                <!-- SIDEBAR USER TITLE -->
+                <div class="profile-usertitle">
+                    <div class="profile-usertitle-name">
+                        Arsh Bhatti
+                    </div>
+                    <div class="profile-usertitle-job">
+                        Administrator
+                    </div>
+                </div>
+                <!-- END SIDEBAR USER TITLE -->
+                <!-- SIDEBAR BUTTONS -->
+                <div class="profile-userbuttons">
+                    <button type="button" class="btn btn-success btn-sm">Follow</button>
+                    <button type="button" class="btn btn-danger btn-sm">Message</button>
+                </div>
+                <!-- END SIDEBAR BUTTONS -->
+                <!-- SIDEBAR MENU -->
+                <div class="profile-usermenu">
+                    <ul class="nav">
+                        <li class="active">
+                            <a href="#">
+                                <i class="glyphicon glyphicon-home"></i>
+                                Overview </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="glyphicon glyphicon-user"></i>
+                                Account Settings </a>
+                        </li>
+                        <li>
+                            <a href="#" target="_blank">
+                                <i class="glyphicon glyphicon-ok"></i>
+                                Tasks </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="glyphicon glyphicon-flag"></i>
+                                Help </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- END MENU -->
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div>
+                <h1>Recent Posts</h1>
+                <form role='form'>
+                    <div class='form-group'>
+                        <div class='input-group'>
+                            <input ng-model='postBody' class='form-control' />
+                            <span class='input-group-btn'>
+                                <button ng-click='addPost()' class='btn btn-default'><strong>Add Post</strong></button>
+          </span>
+                        </div>
+                    </div>
+                </form>
+                <ul class='list-group'>
+                    <li ng-repeat='x in postFile' class='list-group-item'>
+                        <strong>{{ x.username }}</strong>
+                        <span>from <strong>{{ x.cluster }}</strong> says: </span>
+                        <span>{{ x.body }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+<br>
+</body>
+</html>

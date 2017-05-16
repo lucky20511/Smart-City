@@ -1,0 +1,21 @@
+[
+  
+  {
+    "username" : "arshbhatti",
+  "password": "123456",
+  "image": "imagepath",
+  "bio": "hello, how are you",
+  "cluster":"AD",
+  "type": "User"
+}
+,
+  {
+    "username" : "harkanwal",
+    "password": "654321",
+    "image": "imagepath",
+    "bio": "kaise ho launde",
+    "cluster":"AB",
+    "type": "User"
+  }
+
+]
