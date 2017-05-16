@@ -31,7 +31,7 @@ def login():
     if result is None:
         msg = {"msg":"fail"}
     else:
-        msg = {"msg":"succeed"}
+        msg = result
     
     return dumps(msg)
 
@@ -40,7 +40,7 @@ def signUp() :
     
     p_body = json.loads(request.data)
     username = p_body["username"]
-    password = p_body["password"]
+    password = str(p_body["password"])
     cluster = p_body["cluster"]
 
     check = db.Users.find_one({"username":username})
@@ -56,7 +56,6 @@ def signUp() :
         db.Users.insert_one(query)
         db.Clusters.update_one({"clustername":cluster},{"$addToSet":{"users":username}},upsert=False)
       
-        msg = {"msg": "succeed"}
     else:
         msg = {"msg":"fail"}
     
@@ -327,7 +326,7 @@ def deleteMessage() :
             msg = {"msg":"fail"}    
     else:
         msg = {"msg":"fail"}
-        
+
     return dumps(msg)
 
 ################################ TEST ######################################
