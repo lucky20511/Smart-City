@@ -129,30 +129,29 @@ def createAdmin() :
 @app.route('/posts', methods = ['GET'])
 def getAllClusterStatus() : 
     clustername = request.args['cluster']
-    check = db.Clusters.find_one({"clustername":clustername})
-
+    
     db.temp.drop()
     temp = db['temp']
 
-    if check is not None:
-        result = db.Users.find({"cluster":clustername})
-        if result.count() > 0:
-            for c in result:
-                username = c['username']
-                status_result = db.Status.find({"username":username})
-                if status_result.count() > 0:
-                    for c in status_result:
-                        db.temp.insert(c)
-                
-                    ans = db.temp.find().sort('time',-1)
-                    msg = ans   
-        
-        else:
-            msg = {"msg":"fail"}
-                
-    else:
-        msg = {"msg":"fail"}
+    clusters = clustername.split(',')
 
+    for c in clusters:
+        check = db.Clusters.find_one({"clustername":c})
+        if check is None:
+            msg = {"msg":"fail"}
+            return dumps(msg)
+
+    for i in clusters:
+        result = db.Status.find({"cluster":i})
+        if result.count() > 0:
+            for j in result:
+                db.temp.insert(j)
+
+            ans = db.temp.find().sort('time',-1)
+            msg = ans        
+        else:
+            msg = {"msg":"fail"}                
+    
     return dumps(msg)
 
 @app.route('/posts', methods = ['POST'])
