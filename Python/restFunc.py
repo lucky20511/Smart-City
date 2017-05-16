@@ -141,20 +141,24 @@ def deleteUser() :
 
 @app.route("/createsysadmin", methods = ["POST"])
 def createAdmin() :
-    query = {
-        "cluster" : "ALL",
-        "username" : "sysadmin",
-        "password": "admin",
-        "bio" : "Hello, this is my bio!",
-        "image" : "http://leadersinheels.com/wp-content/uploads/facebook-default.jpg",
-        "type": "Sysadmin"
-    }  
-
-    result = db.Users.insert_one(query)
-    if result is None:
-        msg = {"msg": "fail"}
+    
+    check = db.Users.find_one({'username': 'sysadmin'})
+    if check is None:
+        query = {
+            "cluster" : "ALL",
+            "username" : "sysadmin",
+            "password": "admin",
+            "bio" : "Hello, this is my bio!",
+            "image" : "http://leadersinheels.com/wp-content/uploads/facebook-default.jpg",
+            "type": "Sysadmin"
+        }  
+        result = db.Users.insert_one(query)
+        if result is None:
+            msg = {"msg": "fail"}
+        else:
+            msg = {"msg":"succeed"}
     else:
-        msg = {"msg":"succeed"}
+        msg = {"msg": "fail"}
 
     return dumps(msg)
 
