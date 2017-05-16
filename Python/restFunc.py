@@ -112,8 +112,11 @@ def deleteUser() :
 @app.route("/createsysadmin", methods = ["POST"])
 def createAdmin() :
     query = {
+        "cluster" : "ALL",
         "username" : "sysadmin",
         "password": "admin",
+        "bio" : "Hello, this is my bio!",
+        "image" : "http://leadersinheels.com/wp-content/uploads/facebook-default.jpg",
         "type": "Sysadmin"
     }  
 
