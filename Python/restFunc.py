@@ -150,6 +150,7 @@ def createStatus() :
     username = p_body["username"]
     time = str(p_body["time"])
     body = p_body["body"]
+    cluster = p_body["cluster"]
     image= p_body["image"]
 
     query = {
@@ -157,8 +158,7 @@ def createStatus() :
             "time": time,
             "image": image,
             "body": body,
-            "comments":[],
-            "likes":[]
+            "cluster": cluster
         }  
     result = db.Status.insert_one(query)
     if result is None:
@@ -213,7 +213,6 @@ def createCluster() :
 
 @app.route('/clusters', methods = ['DELETE'])
 def deleteCluster() :
-    #TODO DELETE MESSAGES ------------------------------------------------------------------
     clustername = request.args['clustername']
 
     check = db.Clusters.find_one({"clustername":clustername})
@@ -222,7 +221,7 @@ def deleteCluster() :
         if result is not None:
             for c in result:
                 username = c['username']
-                print(username)
+                db.Messages.delete_many({'to':username})
                 bulk = db.Status.initialize_unordered_bulk_op()
                 bulk.find({"username":username}).remove()
                 bulk_result = bulk.execute()
@@ -392,6 +391,7 @@ if __name__ ==  "__main__":
 #             "body": "....",
 #             "time": "....",
 #             "username": "....",
+#             "cluster": "...",
 #             "image": "...."
 #         }
 #     
