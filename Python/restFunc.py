@@ -55,7 +55,9 @@ def signUp() :
             }  
         db.Users.insert_one(query)
         db.Clusters.update_one({"clustername":cluster},{"$addToSet":{"users":username}},upsert=False)
-        msg = {"msg":"succeed"}
+        
+        result = db.Users.find_one({'username':username})
+        msg = result
     else:
         msg = {"msg":"fail"}
     
