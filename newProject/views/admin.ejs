@@ -32,17 +32,10 @@
             <ul class="nav nav-pills nav-stacked">
                 <li class="active"><a href="/profile">Profile</a></li>
                 <li><a href="/moderator">Moderator</a></li>
-                <li><a href="#section3">Add a cluster</a></li>
+                <li><a href="/login">Login</a></li>
                 <li><a href="#section3">Photos</a></li>
             </ul><br>
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search Blog..">
-                <span class="input-group-btn">
-          <button class="btn btn-default" type="button">
-            <span class="glyphicon glyphicon-search"></span>
-          </button>
-        </span>
-            </div>
+
         </div>
         <div class="col-md-4">
             <hr>
@@ -51,7 +44,7 @@
             <table >
                 <tr>
                     <th>Cluster </th>
-                    <th>&nbsp;&nbsp;&nbsp;&nbsp;Country </th>
+                    <th>&nbsp;&nbsp;&nbsp;&nbsp;Name of User </th>
                 </tr>
                 <tr ng-repeat="x in adminFile | orderBy: 'clustername' ">
                     <td>{{x.clustername}}
@@ -67,7 +60,7 @@
             </table>
         </div>
 
-        <div class="col-sm-6 ">
+        <div class="col-md-6 ">
             <div class="dash-unit">
                 <hr>
                 <div class="section-graph">
@@ -81,7 +74,7 @@
         </div>
 
     <!--<div class="row">-->
-        <div class="col-sm-12 forcechart">
+        <div class="col-md-12 forcechart">
                 <hr>
                 <div class="force-graph">
                     <div id="forceChart"></div>
@@ -101,7 +94,7 @@
 
 
 <footer class="container-fluid">
-    <p>Footer Text</p>
+    <p>Smart City</p>
 </footer>
 
 

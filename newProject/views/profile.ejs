@@ -26,12 +26,22 @@ Licensed under MIT
                 <!-- END SIDEBAR USERPIC -->
                 <!-- SIDEBAR USER TITLE -->
                 <div class="profile-usertitle">
+                    <% if (type=="admin"){%>
                     <div class="profile-usertitle-name">
+
                         Arsh Bhatti
                     </div>
                     <div class="profile-usertitle-job">
                         Administrator
                     </div>
+                    <%} else if (type=="moderator"){%>
+                    <div class="profile-usertitle-name">
+                        Rishabh Brar
+                    </div>
+                    <div class="profile-usertitle-job">
+                        Moderator
+                    </div>
+                    <%}%>
                 </div>
                 <!-- END SIDEBAR USER TITLE -->
                 <!-- SIDEBAR BUTTONS -->

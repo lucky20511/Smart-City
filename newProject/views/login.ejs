@@ -1,0 +1,58 @@
+
+<html>
+  <head>
+    <title>Smart City </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	  <link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+	  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+      <script src="javascripts/custom.js"></script>
+
+    <!-- styles -->
+    <link href="stylesheets/style-login.css" rel="stylesheet">
+
+	<script
+	src="javascripts/login-operation.js"></script>
+  </head>
+  <body ng-app="myApp" ng-controller = "login">
+  	<div class="header">
+	     <div class="container">
+	        <div class="row">
+	           <div class="col-md-12">
+	              <!-- Logo -->
+	              <div class="logo">
+	                 <h1><a href="index.html">Project: Smart City</a></h1>
+	              </div>
+	           </div>
+	        </div>
+	     </div>
+	</div>
+
+	<div class="page-content container">
+		<div class="row">
+			<div class="col-md-4 col-md-offset-4">
+				<div class="login-wrapper">
+			        <div class="box">
+			            <div class="content-wrap">
+			                <h6>Sign In</h6>
+			                
+			                <input class="form-control" type="text" placeholder="E-mail address" ng-model="username">
+			                <input class="form-control" type="password" placeholder="Password" ng-model="password">
+			                <div class="action">
+			                    <input type="submit" ng-click="login()"  tabindex="4" class="form-control btn btn-login" value="Log In" style="background-color: #428bca; color:white">
+			                </div>                
+			            </div>
+			        </div>
+			    </div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+  </body>
+  
+	
+</html>
