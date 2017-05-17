@@ -1,6 +1,6 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+
 }
 
    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
@@ -8,7 +8,7 @@ body {
     /* Set gray background color and 100% height */
 .sidenav {
   background-color: #f1f1f1;
-  height: 35%;
+  height: 40%;
 }
 
 /* Set black background color, white text and some padding */
@@ -38,4 +38,26 @@ a {
 .forcechart {
 
     height: 35%;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td{
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  font: 18px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+th{
+  border: 1px solid #dddddd;
+  text-align: center;
+  padding: 8px;
+  font: 22px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
 }

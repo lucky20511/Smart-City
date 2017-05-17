@@ -35,37 +35,31 @@
                     }
                 },
                 series:  [{
-                    name: 'Delivered amount',
+                    name: 'Number of Members',
                     data: st }]
             });
         });
-        $http.get('pieChart.json').success(function(response) {
-            $scope.chartFile = response;
 
-        });
-        //getting the JSON file here
+        //getting the JSON file  to print the names here
     $http.get('admin-info.json').success(function(response) {
         $scope.adminFile = response;
         // Deleting the results
         $scope.delete= function(clustername){
-
-            var index= $scope.adminFile.indexOf(clustername);
-            $scope.adminFile.splice(index,1);
-
-            console.log("JSON was deleted");
+         var index= $scope.adminFile.indexOf(clustername);
+        $scope.adminFile.splice(index,1);
+        console.log("JSON was deleted");
         }
-       //drawing the force directed graph
         var nodes = new vis.DataSet([
-            {id: 1, label: 'Node 1',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/1.png'},
-            {id: 2, label: 'Node 2',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/2.jpg'},
-            {id: 3, label: 'Node 3',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/3.jpeg'},
-            {id: 4, label: 'Node 4',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/4.jpg'},
-            {id: 5, label: 'Node 5',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/5.jpg'}
+            {id: 1, label: 'Fire Department',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/1.png'},
+            {id: 2, label: 'City Department',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/2.jpg'},
+            {id: 3, label: 'San Fernando Apartments',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/3.jpeg'},
+            {id: 4, label: 'PG&E',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/4.jpg'},
+            {id: 5, label: 'Water Department',image:'F:/School Work/Gao 281/Final Project/other examples/Vis-js/images/5.jpg'}
         ]);
 
         // create an array with edges
         var edges = new vis.DataSet([
-            {from: 1, to: 3},
+            {from: 2, to: 3},
             {from: 1, to: 2},
             {from: 2, to: 4},
             {from: 2, to: 5}
@@ -110,6 +104,8 @@
 
         // initialize your network!
         var network = new vis.Network(container, data, options);
+
+
 
     });
 });

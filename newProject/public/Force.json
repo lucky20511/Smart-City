@@ -1,108 +1,13 @@
-{
-  "nodes": [
-    {
-      "name": "Harkanwal Saini",
-      "id": "1",
-      "cluster": "Haveli"
-    },
-    {
-      "name": "Gurkirat Sidhu",
-      "id": "2",
-      "cluster": "Haveli"
-    },
-    {
-      "name": "Sanjot Saini",
-      "id": "3",
-      "cluster": "Haveli"
-    },
-    {
-      "name": "Manpreet Saini",
-      "id": "4",
-      "cluster": "Haveli"
-    },
-    {
-      "name": "Manmeet Gill",
-      "id": "5",
-      "cluster": "Haveli"
-    },
-    {
-      "name": "Arsh Bhatti",
-      "id": "6",
-      "cluster": "Haveli"
-    },
-    {
-      "name": "Avdeep Sandhu",
-      "id": "7",
-      "cluster": "ISH"
-    },
-    {
-      "name": "Chetan Sidhu",
-      "id": "8",
-      "cluster": "ISH"
-    },
-    {
-      "name": "Gunveet Singh",
-      "id": "9",
-      "cluster": "SFA"
-    },
-    {
-      "name": "Jasdeep Singh",
-      "id": "10",
-      "cluster": "SFA"
-    },
-    {
-      "name": "Ashay Argal",
-      "id": "11",
-      "cluster": "SFA"
-    },
-    {
-      "name": "Ajay Modi",
-      "id": "12",
-      "cluster": "SFA"
-    }
-  ]
+{"dataF":[
 
-"links":[
-{
-  "source": 0,
-  "target": 0
-},
-{
-"source": 0,
-"target": 1
-},
-{
-"source": 0,
-"target": 2
-},
-{
-"source": 0,
-"target": 3
-},
-{
-"source": 0,
-"target": 4
-},
-{
-"source": 0,
-"target": 5
-},
+["id": 1, "label": "Node 1"],
+["id": 2, label: "Node 2"]
+["id": 3, label: "Node 3"],
+["id": 4, label: "Node 4"],
+["id": 5, label: "Node 5"]
+]}
 
-{
-"source": 6,
-"target": 7
-},
-{
-"source": 8,
-"target": 9
-},
-{
-"source": 8,
-"target": 10
-},
-{
-"source": 8,
-"target": 11
-}
-]
-}
+
+{"data": [["Haveli", 6],
+  ["ISH", 2],
+  ["SFA", 4]]}

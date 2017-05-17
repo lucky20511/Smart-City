@@ -2,13 +2,14 @@ var profileApp = angular.module('profileApp',[]).controller('profileCtrl',functi
     $http.get('post-data.json').success(function(response) {
         $scope.postFile = response;
     });
+
         // the function runs when the "Add Post" button is clicked
         $scope.addPost = function () {
             // Only add a post if there is a body
             if ($scope.postBody) {
                 // unshift a new post into $scope.posts
                 $scope.postFile.unshift({
-                    username: 'dickeyxxx',
+                    username: 'Arsh Bhatti',
                     body: $scope.postBody // use the text entered
                 })
                 // clear out the input field

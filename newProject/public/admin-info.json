@@ -1,29 +1,54 @@
 [
   {
-    "clustername": "AD",
-    "names": ["Andorra","George"]
-  },
-  {
-    "clustername": "AD",
+    "clustername": "City Department",
     "names": "Andorra"
   },
   {
-    "clustername": "AD",
-    "names": ["Andorra","George"]
+    "clustername": "Colonade Apartments",
+    "names": "Arsh"
+  },
+  {
+    "clustername": "City Department",
+    "names": "Barry Allen"
   },{
-  "clustername": "AD",
-  "names": ["Andorra","George"]
+  "clustername": "Colonade Apartments ",
+  "names": "Harkanwal"
 },{
-  "clustername": "AD",
-  "names": ["Andorra","George"]
+  "clustername": "San Fernando Apartments",
+  "names": "Ashay"
 },{
-  "clustername": "AD",
-  "names": ["Andorra","George"]
+  "clustername": "San Fernando Apartments",
+  "names": "Abhay"
 },{
-  "clustername": "AD",
-  "names": ["Andorra","George"]
+  "clustername": "San Fernando Apartments",
+  "names": "Vaibhav"
 },{
-  "clustername": "AD",
-  "names": ["Andorra","George"]
-}
+  "clustername": "Fire Department",
+  "names": "Jay"
+},
+  {
+    "clustername": "Fire Department",
+    "names": "James"
+  },
+  {
+    "clustername": "PG&E",
+    "names": "Logan"
+  },
+  {
+    "clustername": "Fire Department",
+    "names": "Andrew"
+  },{
+  "clustername": "PG&E",
+  "names": "Nicholas"
+},{
+  "clustername": "Water Department",
+  "names": "Rav"
+  },
+  {
+    "clustername": "Water Department",
+    "names": "Dwight"
+  }
+
+
+
 ]

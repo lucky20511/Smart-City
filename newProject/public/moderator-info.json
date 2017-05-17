@@ -1,21 +1,69 @@
 [
   
   {
-    "username" : "arshbhatti",
+    "username" : "ashayArgal",
   "password": "123456",
   "image": "imagepath",
-  "bio": "hello, how are you",
-  "cluster":"AD",
+  "bio": "hello, I like volleyball",
+  "cluster":"San Fernando Apartments",
   "type": "User"
 }
 ,
   {
+    "username" : "Samneet1",
+    "password": "654321",
+    "image": "imagepath",
+    "bio": "Hi, I like basketball.",
+    "cluster":"San Fernando Apartments",
+    "type": "User"
+  },
+  {
+    "username" : "Andorra123",
+    "password": "654321",
+    "image": "imagepath",
+    "bio": "Hi, I like basketball.",
+    "cluster":"San Fernando Apartments",
+    "type": "User"
+  },{
+  "username" : "Andrew0788",
+  "password": "654321",
+  "image": "imagepath",
+  "bio": "Hi, I like basketball.",
+  "cluster":"San Fernando Apartments",
+  "type": "User"
+},
+  {
+    "username" : "James1991",
+    "password": "654321",
+    "image": "imagepath",
+    "bio": "Hi, I like basketball.",
+    "cluster":"San Fernando Apartments",
+    "type": "User"
+  },
+  {
+    "username" : "Jay254",
+    "password": "654321",
+    "image": "imagepath",
+    "bio": "Hi, I like basketball.",
+    "cluster":"San Fernando Apartments",
+    "type": "User"
+  },
+  {
+    "username" : "abhay",
+    "password": "654321",
+    "image": "imagepath",
+    "bio": "Hi, I like basketball.",
+    "cluster":"San Fernando Apartments",
+    "type": "User"
+  },
+  {
     "username" : "harkanwal",
     "password": "654321",
     "image": "imagepath",
-    "bio": "kaise ho launde",
-    "cluster":"AB",
+    "bio": "Hi, I like basketball.",
+    "cluster":"San Fernando Apartments",
     "type": "User"
   }
+
 
 ]
